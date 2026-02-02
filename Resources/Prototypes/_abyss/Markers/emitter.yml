@@ -1,0 +1,12 @@
+- type: entity
+  id: DeepSeaAmbianceEmitter
+  name: deep sea ambiance emitter
+  parent: MarkerBase
+  suffix: Abyss, Ambiance
+  components:
+  # Синий крестик: в редакторе виден (включи "маркеры"), в игре скрыт
+  - type: Sprite
+    drawdepth: Overdoors
+    sprite: Markers/cross.rsi
+    state: blue
+  # Звуки DeepSeaRattles на Sweetwater воспроизводятся клиентом (ContentAudioSystem.SweetwaterAmbient)

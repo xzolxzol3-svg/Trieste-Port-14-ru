@@ -1,47 +1,49 @@
 ﻿<Document>
-# Trieste Info
+# Информация о Триесте
 
-   Trieste Port is very different from other SS14 servers, both in setting and mechanics.
-   Check out the Lore page for the story and lore of the server.
+   Порт Триест (Trieste Port) сильно отличается от других серверов SS14 как сеттингом, так и механиками.
+   Загляните на страницу Лора, чтобы узнать историю и предысторию сервера.
 
-   Trieste Port takes place on an old ex-NT oil rig, on a ocean world in the outer rim. You play as Anti-NT settlers who have made this settlement as a free port from Megacorporations.
+   Действие происходит на старой бывшей нефтяной платформе NT, на океанической планете во внешнем кольце. Вы играете за поселенцев-противников NT, создавших это поселение как свободный от мегакорпораций порт.
 
-# What's New?
+# Что нового?
 
-   Trieste has a few new mechanics you should be aware of:
+   В Триесте есть несколько новых механик, о которых вам стоит знать:
 
-   - Falling: If you step off the platform or throw something off, it will fall into the Waste Zone below. Go south if you fall, there's a ladder you can climb to go back up.
+   - Падение: Если вы сойдете с платформы или что-то сбросите, оно упадет в Зону Отходов (Waste Zone) ниже. Если упали сами — идите на юг, там есть лестница, по которой можно подняться обратно.
 
-   - Cold Air: Trieste (the platform) is very cold. Wear a jacket if you're outside for a long time, and turn on the heaters inside buildings to keep them toasty.
+   - Холодный воздух: На платформе Триест очень холодно. Носите куртку, если долго находитесь снаружи, и включайте обогреватели внутри зданий, чтобы не замерзнуть.
 
-   - The Diving Bell: The map is separated in two main sections: Trieste and Sweetwater.
+   - Водолазный колокол: Карта разделена на две основные секции: Триест и Свитуотер (Sweetwater).
 
-     > Trieste contains the Bridge, Kitchen, Hydroponics, Stage, Security, Cargo, Medical, Detective, Court, and Reporter.
+     > Триест включает: Мостик, Кухню, Гидропонику, Сцену, Службу Безопасности, Карго, Медблок, Детектива, Суд и Репортера.
 
-     > Sweetwater contains the Bar, Science, Engineering, Salvage, Janitorial and Library. Also most of the Maintenence shafts and the actual Basin.
+     > Свитуотер включает: Бар, РНД (Науку), Инженерный отсек, Утилизаторов, Уборщика и Библиотеку. Также там находится большая часть техтоннелей и собственно Дно (Basin).
 
-   - No space in my space game???: That's right, this fork takes place ON A PLANET! Most of salvage happens on the Basin, under the sea. This is where mining and salvaging wrecks can happen, as well as hunting fauna. (Not all fauna likes being hunted, however)
+   - В моей космо-игре нет космоса???: Именно так, действие происходит НА ПЛАНЕТЕ! Карта разделена на глубины:
+     > Дно (Basin): Уровень морского дна под станцией. Здесь добывают руду, разбирают обломки и охотятся на фауну.
+     > Бездна (Trench): Глубокая расщелина ниже Дна. Там смертельное давление, куда лучше не падать.
 
-   - Chemical Denaturing: To prevent people from Lavabeakering (heating a beaker to the temperature of the sun to instantly mix things), chemicals now denature and become useless if their temperature is too high. Plasma also explodes.
+   - Денатурация химикатов: Чтобы игроки не создавали "Лавовые мензурки" (нагрев мензурки до температуры солнца для мгновенного смешивания), химикаты теперь денатурируют и становятся бесполезными, если температура слишком высока. Плазма также взрывается.
 
-   - NT agents: Not just Syndies anymore, when you roll a Traitor, you have a 50/50 chance to either be aligned with Nanotrasen or The Syndicate, each with their own uplinks and currencies.
+   - Агенты NT: Больше не только Синдикат. Когда вам выпадает роль Предателя, у вас есть шанс 50/50 быть на стороне Nanotrasen или Синдиката, у каждого из которых свои агплинки и валюта.
 
-   - The Artifact: Sweetwater is powered by The Artifact. This makes almost infinite energy, but must be taken care of. Pretty much a mixed Tesla and Singularity, don't let the rods break or it'll reap havoc.
+   - Артефакт: Свитуотер питается от Артефакта. Он дает почти бесконечную энергию, но за ним нужно следить. Это, по сути, смесь Теслы и Сингулярности: не дайте стержням сломаться, иначе начнется хаос.
 
-   - Flooding: Due to the fact that Sweetwater is underwater, hull breaches are considerably more dangerous than spacings. Water kills the unprotected fast, and it's freezing. It also breaks lights. Be weary!
-     > Sweetwater has built in draining systems and bulkheads to manage floods once they are sealed, give it time. This can be sped up with compact scrubbers, however.
+   - Затопление: Из-за того, что Свитуотер находится под водой, пробоины корпуса гораздо опаснее разгерметизации в космосе. Вода быстро убивает незащищенных, и она ледяная. Она также ломает освещение. Будьте осторожны!
+     > В Свитуотере встроены дренажные системы и шлюзы для борьбы с наводнениями после герметизации, дайте им время. Процесс можно ускорить компактными скрабберами.
 
-   - Jellids: Jellids are a new race, a "jellyfish people". They can only breathe water, and use a breathing apparatus to manage their internal water with a water tank.
-     > Jellids cannot get any nutrition from food. They instead must charge themselves by holding a battery (or any battery operated device) and siphon charge from it. (This happens automatically)
-     > Jellids are also immune to Basin pressure (they are not, however, immune to Trench pressure)
-     > The in-lore Jellid naming scheme is generally two names of stars (AKA, Sirius Erindani). Not enforced by any means in practice.
+   - Джеллиды: Джеллиды — это новая раса, "люди-медузы". Они могут дышать только водой и используют дыхательный аппарат с баллоном для поддержания уровня воды в организме.
+     > Джеллиды не получают питания от еды. Вместо этого они должны заряжаться, держа в руках батарейку (или любое устройство на батарейках) и выкачивая из него заряд. (Это происходит автоматически).
+     > Джеллиды также невосприимчивы к давлению Дна (но НЕ иммунны к давлению Бездны).
+     > Лорная схема имен Джеллидов — это обычно два названия звезд (например, Сириус Эриндани). На практике это никак не принуждается.
 
-   - The Rotund Stepfather (and Pilot): The Stepfather and The Pilot are co-dependent roles that must work together. The stepfather is a sentient mech which must follow the Pilot's orders. The pilot must manage the mech and use it to complete their operations on the Basin.
-     > As a Stepfather, your laws are: "Protect the Pilot, Uphold your pilot's orders, and Stay with your pilot" in that order. Consider them Borg laws.
-     > The Stepfather has one hand and an ID slot to assist the Pilot with. It's also common courtesy to hand control over the mech to the pilot when they board.
+   - Тучный Отчим (и Пилот): Отчим и Пилот — взаимозависимые роли, которые должны работать вместе. Отчим — это разумный мех, который должен следовать приказам Пилота. Пилот должен обслуживать меха и использовать его для выполнения операций на Дне.
+     > Как Отчим, ваши законы: "Защищать Пилота, Выполнять приказы Пилота и Оставаться со своим Пилотом" — именно в таком порядке. Считайте их законами боргов.
+     > У Отчима есть одна рука и слот для ID, чтобы помогать Пилоту. Также считается правилом хорошего тона передавать управление мехом пилоту, когда тот залезает внутрь.
 
-   - Water Purification: If you boil Sea Water, it will turn into Water Vapor and Salt. The Water Vapor can be re-condensed into drinking water. The Settler Outpost has a facility with this ability built in.
+   - Очистка воды: Если вскипятить Морскую воду, она превратится в Водяной пар и Соль. Водяной пар можно снова конденсировать в питьевую воду. На Аванпосте Поселенцев есть встроенная установка с такой функцией.
 
-   - Settlers: Did you die? Fall into the Trench, mugged by Drifters, thrown off the Platform? That's alright! You can respawn as a Settler, with your very own outpost! It comes retrofitted with everything you'd need to do most things, so have fun!
+   - Поселенцы: Умерли? Упали в Бездну, ограблены Бродягами, сброшены с Платформы? Ничего страшного! Вы можете возродиться как Поселенец на собственном аванпосте! Он оснащен всем необходимым для большинства задач, так что развлекайтесь!
 
 </Document>

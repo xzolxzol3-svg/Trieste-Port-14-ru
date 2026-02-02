@@ -1,0 +1,1 @@
+stack-bluespace-crystal = Блюспейс-кристалл

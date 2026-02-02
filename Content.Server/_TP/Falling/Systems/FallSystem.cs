@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server.Chat.Systems;
 using Content.Server._TP.Ladder;
 using Content.Server.Popups;
 using Content.Shared.Climbing.Components;
@@ -13,6 +14,7 @@ using Content.Shared.Revenant.Components;
 using Content.Shared.Salvage.Fulton;
 using Content.Shared.Shuttles.Components;
 using Content.Shared.Silicons.StationAi;
+using Content.Shared.Speech.Components;
 using Content.Shared.Stunnable;
 using Robust.Shared.Map;
 
@@ -25,6 +27,7 @@ public sealed class FallSystem : EntitySystem
     [Dependency] private readonly PopupSystem _popup = default!;
     [Dependency] private readonly SharedTransformSystem _transformSystem = default!;
     [Dependency] private readonly ClimbSystem _climb = default!;
+    [Dependency] private readonly ChatSystem _chat = default!;
 
     public override void Initialize()
     {
@@ -197,5 +200,9 @@ public sealed class FallSystem : EntitySystem
         };
         _damageable.TryChangeDamage(owner, damage, origin: owner);
         _popup.PopupEntity(Loc.GetString("fell-to-seafloor"), owner, PopupType.LargeCaution);
+
+        // Крик через встроенную систему эмот (раса/пол, текст над головой)
+        var screamId = TryComp(owner, out VocalComponent? vocal) ? vocal.ScreamId : "Scream";
+        _chat.TryEmoteWithChat(owner, screamId, ignoreActionBlocker: true);
     }
 }

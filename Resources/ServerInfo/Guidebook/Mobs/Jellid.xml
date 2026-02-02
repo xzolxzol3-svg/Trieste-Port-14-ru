@@ -5,26 +5,26 @@
     <GuideEntityEmbed Entity="TP14MobJellidPerson" Caption=""/>
   </Box>
 
-  Jellids are a native species to the planet Trieste resides on. They were built to survive the deep sea and have trouble surviving on dry land.
+  Джеллиды — это коренной вид планеты, на которой расположен Триест. Они эволюционировали для выживания в глубоководье и испытывают трудности при нахождении на суше.
 
-  They have a naming scheme based off of stars and constallations, as they had never seen them prior to the Trieste settlers first contact and have grown to have a strong facination with space.
-  ex. Regulus, Centauri, Sirius, Betelgeuse, Orion
+  Их система именования основана на названиях звёзд и созвездий, так как они никогда не видели их до первого контакта с поселенцами Триеста и с тех пор питают сильную страсть к космосу.
+  Примеры имен: Регул, Центавра, Сириус, Бетельгейзе, Орион.
 
-  ## Breathing
+  ## Дыхание
 
-  Jellids need to breathe water to keep their membrane's osmosis stable, or else they bleed their seawater out and rip their membrane.
-  They are, however, immune to the ocean's extreme cold and pressure, making them adept expeditioneers.
+  Джеллидам необходимо дышать водой для поддержания стабильного осмоса мембраны. В противном случае они теряют внутреннюю морскую воду, что приводит к разрыву их оболочки.
+  Тем не менее, они невосприимчивы к экстремальному холоду и давлению океана, что делает их превосходными экспедиторами.
 
-  Trieste has developed tubing that can directly feed seawater into their mantle, allowing unobstructed view.
+  На Триесте была разработана система трубок, которые подают морскую воду напрямую в их мантию, обеспечивая при этом свободный обзор.
 
-  ## Power
+  ## Питание (Энергия)
 
-  Jellids do not eat, nor do they drink. Instead, they have large energy stores that directly convert charged electrons into an energy source.
-  They do this by siphoning the electrons from power containing objects such as: power cells, stun batons or disablers.
-  If they run out of energy, they will die rapidly. They have an estimated 15 minutes of energy before this happens.
+  Джеллиды не едят и не пьют. Вместо этого у них есть вместительные накопители, которые напрямую преобразуют электроны в источник энергии.
+  Они получают её, вытягивая заряд из энергосодержащих предметов, таких как: батарейки (power cells), шоковые дубинки (stun batons) или дизейблеры.
+  Если у них закончится энергия, они быстро погибнут. По оценкам, у джеллида есть около 15 минут после полной разрядки, прежде чем наступит смерть.
 
-  ## First contact
+  ## Первый контакт
 
-  Jellids were first discovered when Trieste settlers first came to the abandoned Sweetwater complex, finding it in disrepair and overrun with algae. The first explorers found a native Jellid colony living inside, siphoning the spare energy from the long unpowered SMES and cables.
-  They were given universal translators, and specialized breathing packs to allow them to enter dry land and join the settlement. In exchange, they assisted with the renovations of Sweetwater and helped locate the Artifact due to their innate taste for energy.
+  Джеллиды были обнаружены, когда поселенцы Триеста впервые прибыли в заброшенный комплекс Свитуотер (Sweetwater), найдя его в запустении и заросшим водорослями. Первые исследователи обнаружили внутри колонию местных джеллидов, которые питались остатками энергии из давно обесточенных СМЭС (SMES) и кабелей.
+  Им выдали универсальные переводчики и специальные дыхательные аппараты, чтобы они могли выходить на сушу и присоединиться к поселению. В обмен на это джеллиды помогали в восстановлении Свитуотера и, благодаря своему врожденному чутью на энергию, помогли обнаружить Артефакт.
 </Document>

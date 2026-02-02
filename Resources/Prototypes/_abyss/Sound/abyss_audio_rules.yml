@@ -1,0 +1,50 @@
+# Правила случайных one-shot эмбиентов (Sweetwater, Trieste, Waste Zone, море и т.д.).
+#
+# requiredGridNames — имена гридов (MetaData.EntityName). Пустой = любой грид.
+# requiredMapIds — ID карт (MapId). Например Waste Zone = 7. Пустой = любая карта.
+# Можно задать оба: тогда игрок должен быть и на нужном гриде, и на нужной карте.
+#
+# Пример Waste Zone (многоуровневая зона Trieste, Map=7):
+# - type: abyssSoundRule
+#   id: WasteZoneAmbient
+#   soundCollection: WasteZoneCreaks
+#   fallbackPath: /Audio/_abyss/waste/ambient.ogg
+#   minIntervalSec: 30
+#   maxIntervalSec: 90
+#   requiredMapIds: [7]
+#   requiredGridNames: []
+#   requireNotInWater: true
+#   requireInWater: false
+#
+# Пример открытого моря (только в воде):
+# - type: abyssSoundRule
+#   id: SeaWaterAmbient
+#   soundCollection: SeaAmbient
+#   requiredGridNames: []
+#   requiredMapIds: []
+#   requireNotInWater: false
+#   requireInWater: true
+
+- type: abyssSoundRule
+  id: SweetwaterStationCreaks
+  soundCollection: DeepSeaRattles
+  fallbackPath: /Audio/_abyss/sea/ambient_1.ogg
+  minIntervalSec: 45
+  maxIntervalSec: 120
+  volume: -8
+  pitchVariation: 0.08
+  requiredGridNames: ["Sweetwater"]
+  requireNotInWater: true
+  requireInWater: false
+
+- type: abyssSoundRule
+  id: TriesteAmbient
+  soundCollection: TriesteCreaks
+  fallbackPath: /Audio/_abyss/trieste/test.ogg
+  minIntervalSec: 1
+  maxIntervalSec: 5
+  volume: -8
+  pitchVariation: 0.08
+  requiredGridNames: ["Trieste"]
+  requireNotInWater: true
+  requireInWater: false

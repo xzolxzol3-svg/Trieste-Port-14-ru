@@ -1,0 +1,16 @@
+job-supervisors-centcom = Самому себе
+job-supervisors-captain = Управляющему
+job-supervisors-hop = Главе персонала
+job-supervisors-hos = Маршалу
+job-supervisors-ce = Старшему инженеру
+job-supervisors-cmo = Главному врачу
+job-supervisors-rd = Научному руководителю
+job-supervisors-qm = Харбормастеру
+job-supervisors-service = Шеф-поварам, ботаникам, бармену и главе персонала
+job-supervisors-engineering = Инженерам платформы, атмосферным техникам и старшему инженеру
+job-supervisors-medicine = Врачам, парамедикам, химикам и главному врачу
+job-supervisors-security = Офицерам СБ, смотрителю и маршалу
+job-supervisors-science = Учёным и научному руководителю
+job-supervisors-hire = Своим нанимателям
+job-supervisors-everyone = Вообще всем
+job-supervisors-nobody = Никому

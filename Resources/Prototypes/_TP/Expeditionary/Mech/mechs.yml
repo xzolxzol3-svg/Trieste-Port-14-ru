@@ -2,8 +2,8 @@
   id: TP14MechStepfather
   parent: [ BaseMech, BaseMob, StripableInventoryBase ]
   suffix: Trieste, Expeditionary
-  name: Rotund Stepfather
-  description: A rugged deep-sea mining unit, designed to work in tandem with a Pilot. The onboard AI operates the primary clamp while the pilot operates the modules.
+  name: Тучный Отчим
+  description: Надежный глубоководный горнодобывающий модуль, разработанный для работы в тандеме с пилотом. Бортовой ИИ управляет основной клешней, в то время как пилот управляет модулями.
   components:
   - type: ContainerFill
     containers:

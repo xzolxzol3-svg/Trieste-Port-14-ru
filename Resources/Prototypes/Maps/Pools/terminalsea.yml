@@ -1,4 +1,4 @@
-- type: gameMap
+﻿- type: gameMap
   id: Terminal
   mapName: Terminal
   mapPath: /Maps/Misc/terminal.yml
