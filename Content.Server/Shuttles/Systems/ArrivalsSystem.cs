@@ -341,7 +341,13 @@ public sealed class ArrivalsSystem : EntitySystem
         if (ev.SpawnResult != null)
             return;
 
-        // We use arrivals as the default spawn so don't check for job prio.
+        // Мы используем arrivals как дефолтный спавн, поэтому не проверяем job prio.
+        // НО: для некоторых работ (моряки и т.п.) мы хотим игнорировать arrivals и дать
+        // им свой latejoin через обычную систему спавна.
+
+        // Пример: TP14Deckhand (моряки) должны появляться на корабле, а не на arrivals.
+        if (ev.Job == "TP14Deckhand")
+            return;
 
         // Only works on latejoin even if enabled.
         if (!Enabled || _ticker.RunLevel != GameRunLevel.InRound)
