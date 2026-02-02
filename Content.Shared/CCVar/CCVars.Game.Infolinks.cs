@@ -20,7 +20,7 @@ public sealed partial class CCVars
     ///     Link to GitHub page to show in the launcher.
     /// </summary>
     public static readonly CVarDef<string> InfoLinksGithub =
-        CVarDef.Create("infolinks.github", "https://github.com/Pixeltheaertist/Trieste-Port-14.git", CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("infolinks.github", "https://github.com/xzolxzol3-svg/Trieste-Port-14-ru", CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
     ///     Link to website to show in the launcher.
@@ -32,7 +32,7 @@ public sealed partial class CCVars
     ///     Link to wiki to show in the launcher.
     /// </summary>
     public static readonly CVarDef<string> InfoLinksWiki =
-        CVarDef.Create("infolinks.wiki", "", CVar.SERVER | CVar.REPLICATED);
+        CVarDef.Create("infolinks.wiki", "http://217.26.25.88:3000/", CVar.SERVER | CVar.REPLICATED);
 
     /// <summary>
     ///     Link to Patreon. Not shown in the launcher currently.

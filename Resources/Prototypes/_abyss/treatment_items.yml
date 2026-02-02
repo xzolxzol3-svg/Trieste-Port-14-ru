@@ -1,0 +1,100 @@
+# Barotrauma-style treatment items
+# These items can be used to treat specific wound types
+
+- type: entity
+  name: gauze
+  description: Some gauze to stop bleeding from cuts and abrasions.
+  id: GauzeBarotrauma
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: gauze
+  - type: Item
+    sprite: Objects/Specific/Medical/medical.rsi
+    heldPrefix: gauze
+  - type: Healing
+    damage:
+      groups:
+        Brute: -15
+  - type: Stack
+    stackType: Gauze
+    count: 5
+  - type: StackPrice
+    price: 10
+  - type: TreatmentItem
+    treatmentType: Slash
+    healingAmount: 25
+    treatmentTime: 3
+
+- type: entity
+  name: ointment
+  description: A tube of ointment for treating burns.
+  id: OintmentBarotrauma
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: ointment
+  - type: Item
+    sprite: Objects/Specific/Medical/medical.rsi
+    heldPrefix: ointment
+  - type: Healing
+    damage:
+      types:
+        Heat: -15
+  - type: Stack
+    stackType: Ointment
+    count: 5
+  - type: StackPrice
+    price: 10
+  - type: TreatmentItem
+    treatmentType: Burn
+    healingAmount: 25
+    treatmentTime: 3
+
+- type: entity
+  name: brute pack
+  description: A therapeutic gel pack and bandages designed to treat blunt force trauma.
+  id: BrutepackBarotrauma
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: brutepack
+  - type: Item
+    sprite: Objects/Specific/Medical/medical.rsi
+    heldPrefix: brutepack
+  - type: Healing
+    damage:
+      groups:
+        Brute: -20
+  - type: Stack
+    stackType: Brutepack
+    count: 5
+  - type: StackPrice
+    price: 15
+  - type: TreatmentItem
+    treatmentType: Blunt
+    healingAmount: 30
+    treatmentTime: 4
+
+- type: entity
+  name: advanced trauma kit
+  description: An advanced kit for treating severe injuries.
+  id: AdvancedTraumaKit
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: firstaid
+  - type: Item
+    size: Normal
+  - type: Healing
+    damage:
+      groups:
+        Brute: -40
+  - type: TreatmentItem
+    treatmentType: Blunt
+    healingAmount: 50
+    treatmentTime: 6

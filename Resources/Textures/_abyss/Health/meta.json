@@ -1,0 +1,59 @@
+{
+    "version": 1,
+    "license": "CC-BY-SA-3.0",
+    "copyright": "Created by Trieste Port 14 team",
+    "size": {
+        "x": 32,
+        "y": 32
+    },
+    "states": [
+        {
+            "name": "body_head",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        },
+        {
+            "name": "body_torso",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        },
+        {
+            "name": "body_arm_left",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        },
+        {
+            "name": "body_arm_right",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        },
+        {
+            "name": "body_leg_left",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        },
+        {
+            "name": "body_leg_right",
+            "delays": [
+                [
+                    1.0
+                ]
+            ]
+        }
+    ]
+}

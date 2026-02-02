@@ -1,0 +1,10 @@
+# Barotrauma-style health system for SS14
+# Adds health component to base mob
+
+- type: entity
+  id: BaseMobSpeciesHealth
+  abstract: true
+  components:
+  - type: BarotraumaHealth
+
+# Add to existing species (this will be applied via partial prototypes or needs to be added to each species file)
