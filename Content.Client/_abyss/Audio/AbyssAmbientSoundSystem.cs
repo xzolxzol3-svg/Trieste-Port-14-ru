@@ -14,10 +14,10 @@ using Robust.Shared.Utility;
 
 namespace Content.Client._abyss.Audio;
 
-/// <summary>
-/// Воспроизводит случайные one-shot эмбиенты по правилам из прототипов abyssSoundRule.
+/// 
+/// Воспроизводит случайные one-shot эмбиенты / звуки по правилам из прототипов abyssSoundRule.
 /// Поддержка любых карт (Sweetwater, Trieste и т.д.) через requiredGridNames; в воде / не в воде; рандомный питч и громкость.
-/// </summary>
+/// 
 public sealed class AbyssAmbientSoundSystem : EntitySystem
 {
     [Dependency] private readonly IGameTiming _timing = default!;

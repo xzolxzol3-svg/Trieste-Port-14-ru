@@ -4,9 +4,8 @@
   parent: MarkerBase
   suffix: Abyss, Ambiance
   components:
-  # Синий крестик: в редакторе виден (включи "маркеры"), в игре скрыт
+  # Синий крестик
   - type: Sprite
     drawdepth: Overdoors
     sprite: Markers/cross.rsi
     state: blue
-  # Звуки DeepSeaRattles на Sweetwater воспроизводятся клиентом (ContentAudioSystem.SweetwaterAmbient)

@@ -1,0 +1,7 @@
+- type: department
+  id: Sailors
+  name: department-Sailors
+  description: department-Sailors-description
+  color: "#846DCF"
+  roles:
+  - TP14Deckhand

@@ -1,4 +1,4 @@
-# Правила случайных one-shot эмбиентов (Sweetwater, Trieste, Waste Zone, море и т.д.).
+# Правила случайных one-shot эмбиентов / звуков (Sweetwater, Trieste, Waste Zone, море и т.д.).
 #
 # requiredGridNames — имена гридов (MetaData.EntityName). Пустой = любой грид.
 # requiredMapIds — ID карт (MapId). Например Waste Zone = 7. Пустой = любая карта.

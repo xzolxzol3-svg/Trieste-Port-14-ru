@@ -41,10 +41,7 @@ namespace Content.Shared.Localizations
             _loc.AddFunction(culture, "PLAYTIME", FormatPlaytime);
 
 
-            /*
-             * MAKEPLURAL/MANY добавляются в загруженную культуру (ru-RU). Добавлять их в en-US нельзя:
-             * en-US не загружается (_loc.LoadCulture только для Culture = "ru-RU"), словарь не содержит en-US.
-             */
+
             _loc.AddFunction(culture, "MAKEPLURAL", FormatMakePlural);
             _loc.AddFunction(culture, "MANY", FormatMany);
         }

@@ -1,0 +1,30 @@
+- type: job
+  id: TP14Deckhand
+  name: job-name-deckhand
+  description: job-description-deckhand
+  playTimeTracker: TP14DeckhandTracker
+  icon: "JobIconShaftMiner"
+  startingGear: TP14DeckhandGear
+  supervisors: job-supervisors-qm
+  access:
+  - Salvage
+  - Maintenance
+  - External
+
+- type: startingGear
+  id: TP14DeckhandGear
+  equipment:
+    id: SalvagePDA
+    ears: ClothingHeadsetMining
+
+- type: chameleonOutfit
+  id: TP14ExpeditioneerChameleonOutfit
+  job: TP14Deckhand
+  equipment:
+    head: ClothingHeadHatCargosoft
+    eyes: ClothingEyesGlassesCheapSunglasses
+    mask: ClothingMaskGasExplorer
+    outerClothing: ClothingOuterWinterMiner
+    neck: ClothingNeckScarfStripedBrown
+    gloves: ClothingHandsGlovesColorBlack
+
