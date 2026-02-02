@@ -37,14 +37,14 @@
   requireNotInWater: true
   requireInWater: false
 
-- type: abyssSoundRule
-  id: TriesteAmbient
-  soundCollection: TriesteCreaks
-  fallbackPath: /Audio/_abyss/trieste/test.ogg
-  minIntervalSec: 1
-  maxIntervalSec: 5
-  volume: -8
-  pitchVariation: 0.08
-  requiredGridNames: ["Trieste"]
-  requireNotInWater: true
-  requireInWater: false
+- # type: abyssSoundRule
+  # id: TriesteAmbient
+  # soundCollection: TriesteCreaks
+  # fallbackPath: /Audio/_abyss/trieste/test.ogg
+  # minIntervalSec: 1
+  # maxIntervalSec: 5
+  # volume: -8
+  # pitchVariation: 0.08
+  # requiredGridNames: ["Trieste"]
+  #requireNotInWater: true
+  #requireInWater: false

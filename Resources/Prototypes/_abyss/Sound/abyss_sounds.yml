@@ -3,7 +3,7 @@
   files:
   - /Audio/_abyss/sea/ambient_1.ogg
 
-- type: soundCollection
-  id: TriesteCreaks
-  files:
-  - /Audio/_abyss/trieste/test.ogg
+#   - type: soundCollection
+#  id: TriesteCreaks
+#  files:
+#  - /Audio/_abyss/trieste/test.ogg
