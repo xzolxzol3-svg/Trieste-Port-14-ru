@@ -1,1 +1,1 @@
-department-Expeditionary = Моряки
+department-Sailors = Моряки

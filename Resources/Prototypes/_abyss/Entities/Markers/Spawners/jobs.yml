@@ -1,0 +1,27 @@
+- type: entity
+  id: TP14SpawnPointDeckhand
+  parent: SpawnPointJobBase
+  suffix: Abyss, Spawner, Sailors, Deckhand
+  name: deckhand
+  components:
+  - type: SpawnPoint
+    job_id: TP14Deckhand
+  - type: Sprite
+    layers:
+      - state: green
+      - state: cargo_tech
+
+# LateJoin спавн-поинты не привязаны к профессии (в SpawnPointSystem для InRound используется только spawn_type: LateJoin),
+# но отдельный прототип удобен для маппера: можно поставить "поздний спавн моряков" там, где нужно.
+- type: entity
+  id: TP14SpawnPointLatejoinSailors
+  parent: SpawnPointLatejoin
+  suffix: Abyss, Spawner, Sailors, LateJoin
+  name: latejoin (sailors)
+  components:
+  - type: SpawnPoint
+    job_id: TP14Deckhand
+  - type: Sprite
+    layers:
+      - state: green
+      - state: cargo_tech
