@@ -194,6 +194,7 @@ ui-options-function-focus-console-chat-window = Focus chat (Console)
 ui-options-function-cycle-chat-channel-forward = Cycle channel (Forward)
 ui-options-function-cycle-chat-channel-backward = Cycle channel (Backward)
 ui-options-function-open-character-menu = Open character menu
+ui-options-function-open-health-window = Open health window
 ui-options-function-open-context-menu = Open context menu
 ui-options-function-open-crafting-menu = Open crafting menu
 ui-options-function-open-inventory-menu = Open inventory
