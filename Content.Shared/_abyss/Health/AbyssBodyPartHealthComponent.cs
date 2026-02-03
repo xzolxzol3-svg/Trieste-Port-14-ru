@@ -40,6 +40,8 @@ public sealed partial class AbyssBodyPartHealthComponent : Component
     [ViewVariables]
     public bool IsLimbBroken(string slotId)
     {
+        if (PartMaxHealth == null || PartDamage == null)
+            return false;
         if (!PartMaxHealth.TryGetValue(slotId, out var max) || max <= FixedPoint2.Zero)
             return false;
         return PartDamage.GetValueOrDefault(slotId) >= max;

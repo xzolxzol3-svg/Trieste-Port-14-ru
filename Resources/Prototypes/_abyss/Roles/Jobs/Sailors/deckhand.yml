@@ -18,7 +18,7 @@
     ears: ClothingHeadsetMining
 
 - type: chameleonOutfit
-  id: TP14ExpeditioneerChameleonOutfit
+  id: TP14DeckhandChameleonOutfit
   job: TP14Deckhand
   equipment:
     head: ClothingHeadHatCargosoft

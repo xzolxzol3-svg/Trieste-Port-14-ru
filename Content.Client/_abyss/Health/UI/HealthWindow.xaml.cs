@@ -74,7 +74,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         _selectedLimbSlot = null;
         BodyDoll.SetSelectedSlot(null);
 
-        if (entity is { } uid && _entMan.EntityExists(uid))
+        if (entity is { } uid && uid.IsValid() && _entMan.EntityExists(uid))
         {
             BodyDoll.SetEntity(uid);
             BodyDoll.Visible = true;
@@ -94,7 +94,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
 
     private void RefreshTotalHP()
     {
-        if (!_entity.HasValue)
+        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
         {
             TotalHPLabel.Text = "";
             TotalHPBar.Value = 1;
@@ -103,7 +103,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         }
 
         var uid = _entity.Value;
-        if (_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss))
+        if (_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) && abyss.PartMaxHealth != null && abyss.PartDamage != null)
         {
             FixedPoint2 totalMax = FixedPoint2.Zero;
             FixedPoint2 totalDamage = FixedPoint2.Zero;
@@ -133,7 +133,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
 
     private void UpdateDamagedSlots(EntityUid uid)
     {
-        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss))
+        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) || abyss.PartDamage == null)
         {
             BodyDoll.SetDamagedSlots(null);
             return;
@@ -147,7 +147,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     protected override void Opened()
     {
         base.Opened();
-        if (_entity is { } uid && _entMan.EntityExists(uid))
+        if (_entity is { } uid && uid.IsValid() && _entMan.EntityExists(uid))
             UpdateDamagedSlots(uid);
         RefreshTotalHP();
         RefreshInjuries();
@@ -158,7 +158,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private void RefreshInjuries()
     {
         InjuriesList.RemoveAllChildren();
-        if (!_entity.HasValue)
+        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
         {
             InjuriesList.AddChild(new Label { Text = Loc.GetString("abyss-health-no-data") });
             return;
@@ -171,7 +171,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             return;
         }
 
-        if (!string.IsNullOrEmpty(_selectedLimbSlot) && _entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss))
+        if (!string.IsNullOrEmpty(_selectedLimbSlot) && _entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) && abyss.PartDamage != null && abyss.PartMaxHealth != null)
         {
             var dmg = abyss.PartDamage.GetValueOrDefault(_selectedLimbSlot);
             var max = abyss.PartMaxHealth.GetValueOrDefault(_selectedLimbSlot);
@@ -185,10 +185,11 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             });
         }
 
-        var damageDict = damageable.Damage.DamageDict;
-        if (damageDict.Count == 0 && string.IsNullOrEmpty(_selectedLimbSlot))
+        var damageDict = damageable.Damage?.DamageDict;
+        if (damageDict == null || (damageDict.Count == 0 && string.IsNullOrEmpty(_selectedLimbSlot)))
         {
-            InjuriesList.AddChild(new Label { Text = Loc.GetString("abyss-health-no-injuries") });
+            if (string.IsNullOrEmpty(_selectedLimbSlot))
+                InjuriesList.AddChild(new Label { Text = Loc.GetString("abyss-health-no-injuries") });
             return;
         }
 
@@ -218,7 +219,9 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private void RefreshLimbHealthBars()
     {
         LimbHealthBars.RemoveAllChildren();
-        if (!_entity.HasValue || !_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(_entity.Value, out var abyss))
+        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
+            return;
+        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(_entity.Value, out var abyss) || abyss.PartMaxHealth == null || abyss.PartDamage == null)
             return;
 
         foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
@@ -249,7 +252,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private void RefreshTreatmentItems()
     {
         TreatmentItemsList.RemoveAllChildren();
-        if (!_entity.HasValue)
+        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
             return;
 
         var uid = _entity.Value;
@@ -266,7 +269,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private HashSet<string> GetDamageTypesWithDamage(EntityUid uid)
     {
         var set = new HashSet<string>();
-        if (!_entMan.TryGetComponent<DamageableComponent>(uid, out var d))
+        if (!_entMan.TryGetComponent<DamageableComponent>(uid, out var d) || d.Damage?.DamageDict == null)
             return set;
         foreach (var (k, v) in d.Damage.DamageDict)
         {
@@ -291,16 +294,19 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private List<(EntityUid item, bool recommended)> CollectHealingItems(EntityUid uid)
     {
         var result = new List<(EntityUid, bool)>();
+        if (!_entMan.EntityExists(uid))
+            return result;
+
         var damageTypes = GetDamageTypesWithDamage(uid);
 
         void AddIfHealing(EntityUid item, bool recommended)
         {
-            if (!_entMan.HasComponent<HealingComponent>(item))
+            if (!_entMan.EntityExists(item) || !_entMan.HasComponent<HealingComponent>(item))
                 return;
             result.Add((item, recommended));
         }
 
-        if (_entMan.TryGetComponent<Content.Shared.Hands.Components.HandsComponent>(uid, out var hands))
+        if (_entMan.TryGetComponent<Content.Shared.Hands.Components.HandsComponent>(uid, out var hands) && hands.SortedHands != null)
         {
             foreach (var handId in hands.SortedHands)
             {
@@ -310,7 +316,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             }
         }
 
-        if (!_inventory.TryGetSlots(uid, out var slots))
+        if (!_entMan.HasComponent<InventoryComponent>(uid) || !_inventory.TryGetSlots(uid, out var slots) || slots == null)
             return result;
 
         foreach (var slot in slots)
@@ -318,6 +324,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             if (!_inventory.TryGetSlotEntity(uid, slot.Name, out var slotEnt))
                 continue;
             var ent = slotEnt.Value;
+            if (!_entMan.EntityExists(ent))
+                continue;
             AddIfHealing(ent, IsHealingRecommendedForCurrentDamage(ent, damageTypes));
 
             if (_entMan.TryGetComponent<StorageComponent>(ent, out var storage) && storage.Container != null)
@@ -340,6 +348,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             Orientation = BoxContainer.LayoutOrientation.Horizontal,
             SeparationOverride = 4
         };
+        if (!_entMan.EntityExists(item))
+            return panel;
         var sprite = new SpriteView { SetSize = new Vector2(32, 32) };
         sprite.SetEntity(item);
         var name = _entMan.GetComponentOrNull<MetaDataComponent>(item)?.EntityName ?? item.ToString();

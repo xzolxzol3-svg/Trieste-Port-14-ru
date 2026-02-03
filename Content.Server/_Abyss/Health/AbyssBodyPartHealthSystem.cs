@@ -1,8 +1,10 @@
+using System.Collections.Generic;
 using Content.Shared._abyss.Health;
 using Content.Shared.Body.Components;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
+using Content.Shared.Mobs.Components;
 using Robust.Shared.Random;
 
 namespace Content.Server._abyss.Health;
@@ -21,7 +23,7 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
 
     private void OnDamageableMapInit(Entity<DamageableComponent> ent, ref MapInitEvent args)
     {
-        if (!HasComp<BodyComponent>(ent))
+        if (!HasComp<BodyComponent>(ent) || !HasComp<MobStateComponent>(ent))
             return;
         EnsureComp<AbyssBodyPartHealthComponent>(ent);
     }
@@ -46,6 +48,8 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
     private void OnAbyssHealthInit(Entity<AbyssBodyPartHealthComponent> ent, ref ComponentInit args)
     {
         var comp = ent.Comp;
+        comp.PartMaxHealth ??= new Dictionary<string, FixedPoint2>();
+        comp.PartDamage ??= new Dictionary<string, FixedPoint2>();
         if (comp.PartMaxHealth.Count > 0)
             return;
 
@@ -64,6 +68,8 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
 
     private void AddDamageToRandomLimb(AbyssBodyPartHealthComponent comp, FixedPoint2 amount)
     {
+        if (comp.PartMaxHealth == null || comp.PartDamage == null)
+            return;
         var slots = AbyssBodyPartHealthComponent.LimbSlots;
         var available = new List<string>();
         foreach (var slot in slots)
@@ -84,6 +90,8 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
 
     private void SubtractHealingFromRandomDamagedLimb(AbyssBodyPartHealthComponent comp, FixedPoint2 amount)
     {
+        if (comp.PartDamage == null)
+            return;
         var damaged = new List<string>();
         foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
         {
@@ -100,9 +108,14 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
 
     private void DistributeDamageToRandomLimbs(AbyssBodyPartHealthComponent comp, FixedPoint2 total)
     {
+        if (comp.PartMaxHealth == null || comp.PartDamage == null)
+            return;
         var remaining = total;
-        while (remaining > FixedPoint2.Zero)
+        var maxIterations = AbyssBodyPartHealthComponent.LimbSlots.Length * 4;
+        var iterations = 0;
+        while (remaining > FixedPoint2.Zero && iterations < maxIterations)
         {
+            iterations++;
             var slot = _random.Pick(AbyssBodyPartHealthComponent.LimbSlots);
             var maxH = comp.PartMaxHealth.GetValueOrDefault(slot);
             var cur = comp.PartDamage.GetValueOrDefault(slot);

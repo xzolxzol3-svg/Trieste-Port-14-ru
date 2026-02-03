@@ -57,11 +57,21 @@ public sealed class BodyDollControl : Control
 
     public void SetEntity(EntityUid? uid)
     {
-        _sprite.SetEntity(uid);
+        if (uid is not { } valid || !valid.IsValid())
+        {
+            _sprite.SetEntity(null);
+            return;
+        }
+        _sprite.SetEntity(valid);
     }
 
     public void SetEntity(EntityUid uid)
     {
+        if (!uid.IsValid())
+        {
+            _sprite.SetEntity(null);
+            return;
+        }
         _sprite.SetEntity(uid);
     }
 

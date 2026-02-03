@@ -44,7 +44,8 @@ public sealed class AbyssHealthUIController : UIController, IOnStateEntered<Game
             _window.Close();
         else
         {
-            _window.UpdateEntity(_player.LocalEntity);
+            var local = _player.LocalEntity;
+            _window.UpdateEntity(local);
             _window.Open();
         }
     }
