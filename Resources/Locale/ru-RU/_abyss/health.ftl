@@ -16,3 +16,19 @@ abyss-health-limb-broken = Сломано
 abyss-health-recommended = Рекомендуется
 abyss-health-total-hp = ХП: {$current} / {$max}
 abyss-health-total-damage = Урон: {$amount}
+abyss-health-verb-examine-detail = Детально осмотреть здоровье
+
+# Качественные уровни урона (для не-врачей)
+abyss-health-damage-none = Нет
+abyss-health-damage-light = Лёгкие
+abyss-health-damage-moderate = Умеренные
+abyss-health-damage-severe = Серьёзные
+abyss-health-damage-critical = Критические
+abyss-health-damage-bruises = Ушибы: { $level }
+abyss-health-damage-bleeding = Кровотечение: { $level }
+abyss-health-damage-burn = Ожог: { $level }
+abyss-health-damage-generic = { $type }: { $level }
+abyss-health-state-healthy = Состояние: В норме
+abyss-health-state-injured = Состояние: Ранен
+abyss-health-state-severe = Состояние: Тяжело ранен
+abyss-health-state-critical = Состояние: Критическое

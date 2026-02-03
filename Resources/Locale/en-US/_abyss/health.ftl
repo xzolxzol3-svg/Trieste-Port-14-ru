@@ -16,3 +16,19 @@ abyss-health-limb-broken = Broken
 abyss-health-recommended = Recommended
 abyss-health-total-hp = HP: {$current} / {$max}
 abyss-health-total-damage = Damage: {$amount}
+abyss-health-verb-examine-detail = Examine health in detail
+
+# Qualitative damage (for non-doctors; doctors see numbers)
+abyss-health-damage-none = None
+abyss-health-damage-light = Light
+abyss-health-damage-moderate = Moderate
+abyss-health-damage-severe = Severe
+abyss-health-damage-critical = Critical
+abyss-health-damage-bruises = Bruises: { $level }
+abyss-health-damage-bleeding = Bleeding: { $level }
+abyss-health-damage-burn = Burn: { $level }
+abyss-health-damage-generic = { $type }: { $level }
+abyss-health-state-healthy = Condition: Healthy
+abyss-health-state-injured = Condition: Injured
+abyss-health-state-severe = Condition: Badly injured
+abyss-health-state-critical = Condition: Critical

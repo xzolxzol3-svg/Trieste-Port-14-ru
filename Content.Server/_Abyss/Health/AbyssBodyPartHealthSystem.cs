@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Content.Shared._abyss.Health;
 using Content.Shared.Body.Components;
 using Content.Shared.Damage.Components;
-using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Movement.Systems;
 using Robust.Shared.Random;
 
 namespace Content.Server._abyss.Health;
@@ -12,13 +12,14 @@ namespace Content.Server._abyss.Health;
 public sealed class AbyssBodyPartHealthSystem : EntitySystem
 {
     [Dependency] private readonly IRobustRandom _random = default!;
+    [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
 
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<DamageableComponent, MapInitEvent>(OnDamageableMapInit);
         SubscribeLocalEvent<AbyssBodyPartHealthComponent, ComponentInit>(OnAbyssHealthInit);
-        SubscribeLocalEvent<AbyssBodyPartHealthComponent, DamageChangedEvent>(OnDamageChanged);
+        SubscribeLocalEvent<AbyssBodyPartHealthComponent, AbyssDamageChangedEvent>(OnAbyssDamageChanged);
     }
 
     private void OnDamageableMapInit(Entity<DamageableComponent> ent, ref MapInitEvent args)
@@ -28,12 +29,13 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
         EnsureComp<AbyssBodyPartHealthComponent>(ent);
     }
 
-    private void OnDamageChanged(EntityUid uid, AbyssBodyPartHealthComponent component, DamageChangedEvent args)
+    private void OnAbyssDamageChanged(EntityUid uid, AbyssBodyPartHealthComponent component, AbyssDamageChangedEvent args)
     {
-        if (args.DamageDelta == null || args.DamageDelta.Empty)
+        var inner = args.Inner;
+        if (inner.DamageDelta == null || inner.DamageDelta.Empty)
             return;
 
-        var delta = args.DamageDelta.GetTotal();
+        var delta = inner.DamageDelta.GetTotal();
         if (delta == FixedPoint2.Zero)
             return;
 
@@ -43,6 +45,7 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
             SubtractHealingFromRandomDamagedLimb(component, -delta);
 
         Dirty(uid, component);
+        _movementSpeed.RefreshMovementSpeedModifiers(uid);
     }
 
     private void OnAbyssHealthInit(Entity<AbyssBodyPartHealthComponent> ent, ref ComponentInit args)

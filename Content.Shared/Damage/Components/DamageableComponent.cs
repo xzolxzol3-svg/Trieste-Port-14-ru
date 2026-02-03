@@ -89,6 +89,8 @@ public sealed partial class DamageableComponent : Component
 
     [DataField]
     public FixedPoint2? HealthBarThreshold;
+
+    public FixedPoint2 TotalMaxDamage { get; set; } = FixedPoint2.Zero;
 }
 
 [Serializable, NetSerializable]
