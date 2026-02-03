@@ -31,4 +31,5 @@ abyss-health-damage-generic = { $type }: { $level }
 abyss-health-state-healthy = Condition: Healthy
 abyss-health-state-injured = Condition: Injured
 abyss-health-state-severe = Condition: Badly injured
-abyss-health-state-critical = Condition: Critical
+abyss-health-state-critical = Condition: 
+abyss-health-state-dead = Condition: Dead

@@ -5,6 +5,7 @@ using Content.Shared.Damage.Components;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Systems;
+using Content.Shared.Rejuvenate;
 using Robust.Shared.Random;
 
 namespace Content.Server._abyss.Health;
@@ -20,6 +21,18 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
         SubscribeLocalEvent<DamageableComponent, MapInitEvent>(OnDamageableMapInit);
         SubscribeLocalEvent<AbyssBodyPartHealthComponent, ComponentInit>(OnAbyssHealthInit);
         SubscribeLocalEvent<AbyssBodyPartHealthComponent, AbyssDamageChangedEvent>(OnAbyssDamageChanged);
+        SubscribeLocalEvent<AbyssBodyPartHealthComponent, RejuvenateEvent>(OnRejuvenate);
+    }
+
+    private void OnRejuvenate(Entity<AbyssBodyPartHealthComponent> ent, ref RejuvenateEvent args)
+    {
+        var comp = ent.Comp;
+        if (comp.PartDamage == null)
+            return;
+        foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
+            comp.PartDamage[slot] = FixedPoint2.Zero;
+        Dirty(ent);
+        _movementSpeed.RefreshMovementSpeedModifiers(ent);
     }
 
     private void OnDamageableMapInit(Entity<DamageableComponent> ent, ref MapInitEvent args)

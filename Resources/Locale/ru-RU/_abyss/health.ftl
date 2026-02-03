@@ -32,3 +32,4 @@ abyss-health-state-healthy = Состояние: В норме
 abyss-health-state-injured = Состояние: Ранен
 abyss-health-state-severe = Состояние: Тяжело ранен
 abyss-health-state-critical = Состояние: Критическое
+abyss-health-state-dead = Состояние: Мёртв

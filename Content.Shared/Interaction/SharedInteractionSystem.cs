@@ -120,7 +120,7 @@ namespace Content.Shared.Interaction
             SubscribeLocalEvent<UserInterfaceComponent, BoundUserInterfaceMessageAttempt>(OnBoundInterfaceInteractAttempt);
 
             SubscribeAllEvent<InteractInventorySlotEvent>(HandleInteractInventorySlotEvent);
-
+            SubscribeAllEvent<RequestUseItemOnEntityEvent>(HandleRequestUseItemOnEntity);
             SubscribeLocalEvent<UnremoveableComponent, ContainerGettingRemovedAttemptEvent>(OnRemoveAttempt);
             SubscribeLocalEvent<UnremoveableComponent, GotUnequippedEvent>(OnUnequip);
             SubscribeLocalEvent<UnremoveableComponent, GotUnequippedHandEvent>(OnUnequipHand);
@@ -304,6 +304,35 @@ namespace Content.Shared.Interaction
                 // User used 'E'. We want to activate it, not simulate clicking on the item
                 InteractionActivate(user.Value, item);
         }
+
+        
+        /// <summary>
+        ///     Handles a client request to use a specific item on a specific target (e.g. drag-drop heal on health doll).
+        /// </summary>
+        private void HandleRequestUseItemOnEntity(RequestUseItemOnEntityEvent msg, EntitySessionEventArgs args)
+        {
+            var item = GetEntity(msg.Item);
+            var target = GetEntity(msg.Target);
+
+            if (!Exists(item) || !Exists(target))
+                return;
+
+            if (args.SenderSession.AttachedEntity is not { } user || !Exists(user))
+                return;
+
+            if (!_actionBlockerSystem.CanInteract(user, target))
+                return;
+            var hasAccess = IsAccessible((user, null), (item, null));
+            var inHand = TryComp<HandsComponent>(user, out var handsComp) && _hands.IsHolding((user, handsComp), item, out _);
+            if (!hasAccess && !inHand)
+                return;
+
+            if (!InRangeUnobstructed(user, target, popup: true))
+                return;
+
+            InteractUsing(user, item, target, Transform(target).Coordinates, checkCanInteract: false, checkCanUse: false);
+        }
+
 
         public bool HandleAltUseInteraction(ICommonSession? session, EntityCoordinates coords, EntityUid uid)
         {
@@ -1471,6 +1500,25 @@ namespace Content.Shared.Interaction
             return _actionBlockerSystem.CanComplexInteract(user);
         }
     }
+
+    
+    /// <summary>
+    ///     Raised when the client wants to use a specific item on a specific target (e.g. drag-drop heal onto health doll).
+    /// </summary>
+    [Serializable, NetSerializable]
+    public sealed class RequestUseItemOnEntityEvent : EntityEventArgs
+    {
+        public NetEntity Item { get; }
+        public NetEntity Target { get; }
+
+        public RequestUseItemOnEntityEvent(NetEntity item, NetEntity target)
+        {
+            Item = item;
+            Target = target;
+        }
+    }
+
+    
 
     /// <summary>
     ///     Raised when a player attempts to activate an item in an inventory slot or hand slot
