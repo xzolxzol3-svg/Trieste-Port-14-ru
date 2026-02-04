@@ -1,5 +1,5 @@
 damage-type-asphyxiation = Удушение
-damage-type-bloodloss = Кровопотеря
+damage-type-bloodloss = Потеря крови
 damage-type-blunt = Ушибы
 damage-type-cellular = Клеточные
 damage-type-caustic = Кислотные

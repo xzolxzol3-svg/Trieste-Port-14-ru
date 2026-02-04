@@ -5,6 +5,13 @@
     - Blunt
     - Slash
     - Piercing
+    - Bullet           # огнестрел
+    - Bite             # Укусы
+    - Concussion       # Сотрясение
+    - InternalDamage   # Внутренние
+    - DeepTissueDamage # Глубокие ткани
+    - HighPressure     # Давление (физическое воздействие)
+    - Bleeding
 
 - type: damageGroup
   id: Burn
@@ -25,6 +32,7 @@
   damageTypes:
     - Asphyxiation
     - Bloodloss
+    - Bleeding         # Мое кровотечение (т.к. оно связано с потерей крови)
 
 # As with airloss, most medicine and damage effects should probably modify either poison or radiation.
 # Though there are probably some radioactive poisons.
@@ -34,6 +42,7 @@
   damageTypes:
     - Poison
     - Radiation
+    - OrganDamage      # Повреждение органов (обычно лечится антитоксинами или спец-хирургией)
 
 - type: damageGroup
   id: Genetic

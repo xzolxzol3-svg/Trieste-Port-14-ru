@@ -20,6 +20,7 @@
         Blunt: 0.9
         Slash: 0.9
         Piercing: 0.9
+        Bullet: 0.9
         Caustic: 0.9
   - type: ClothingSpeedModifier
     walkModifier: 0.80

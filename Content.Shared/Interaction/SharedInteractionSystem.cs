@@ -332,16 +332,7 @@ namespace Content.Shared.Interaction
                 return;
 
             // Mark this interaction as coming from the Abyss health panel.
-            var prev = AbyssHealingContext.FromHealthPanel;
-            AbyssHealingContext.FromHealthPanel = true;
-            try
-            {
-                InteractUsing(user, item, target, Transform(target).Coordinates, checkCanInteract: false, checkCanUse: false);
-            }
-            finally
-            {
-                AbyssHealingContext.FromHealthPanel = prev;
-            }
+            InteractUsing(user, item, target, Transform(target).Coordinates, checkCanInteract: false, checkCanUse: false);
         }
 
 

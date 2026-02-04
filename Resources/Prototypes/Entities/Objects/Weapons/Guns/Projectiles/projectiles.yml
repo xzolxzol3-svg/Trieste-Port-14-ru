@@ -88,7 +88,7 @@
     impactEffect: BulletImpactEffect
     damage:
       types:
-        Piercing: 14
+        Bullet: 14
     soundHit:
       path: /Audio/Weapons/Guns/Hits/bullet_hit.ogg
   - type: TimedDespawn
@@ -142,7 +142,7 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 10
+        Bullet: 10
         Heat: 4
   - type: PointLight
     enabled: true
@@ -165,7 +165,7 @@
   - type: Projectile
     damage:
       types:
-        Piercing: 11 # 20% decrease
+        Bullet: 11 # 20% decrease
     ignoreResistances: true
 
 - type: entity

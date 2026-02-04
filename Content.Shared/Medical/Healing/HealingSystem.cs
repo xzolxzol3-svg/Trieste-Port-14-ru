@@ -10,7 +10,7 @@ using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
-using Content.Shared._abyss.Health;
+using Content.Shared._abyss.Health; // Наш неймспейс
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -40,11 +40,35 @@ public sealed class HealingSystem : EntitySystem
         SubscribeLocalEvent<HealingComponent, UseInHandEvent>(OnHealingUse);
         SubscribeLocalEvent<HealingComponent, AfterInteractEvent>(OnHealingAfterInteract);
         SubscribeLocalEvent<DamageableComponent, HealingDoAfterEvent>(OnDoAfter);
+        
+        // !!! НОВОЕ: Слушаем команду от UI панели !!!
+        SubscribeAllEvent<AbyssHealRequestEvent>(OnAbyssHealRequest);
+    }
+
+    // Обработка запроса от Панели Здоровья (Сетевое событие)
+    private void OnAbyssHealRequest(AbyssHealRequestEvent args, EntitySessionEventArgs session)
+    {
+        var user = session.SenderSession.AttachedEntity;
+        if (user == null) return;
+
+        // Превращаем сетевые ID в локальные
+        var item = GetEntity(args.Item);
+        var target = GetEntity(args.Target);
+
+        // Проверки безопасности (существует ли предмет, есть ли компонент хила)
+        if (!TryComp<HealingComponent>(item, out var healing))
+            return;
+
+        // Проверка дистанции (чтобы не хилили через стены)
+        if (!_interactionSystem.InRangeUnobstructed(user.Value, target, popup: true))
+            return;
+
+        // Запускаем хил напрямую
+        TryHeal((item, healing), target, user.Value);
     }
 
     private void OnDoAfter(Entity<DamageableComponent> target, ref HealingDoAfterEvent args)
     {
-
         if (args.Handled || args.Cancelled)
             return;
 
@@ -139,7 +163,6 @@ public sealed class HealingSystem : EntitySystem
 
         if (TryComp<BloodstreamComponent>(target, out var bloodstream))
         {
-            // Is ent missing blood that we can restore?
             if (healing.Comp.ModifyBloodLevel > 0
                 && _solutionContainerSystem.ResolveSolution(target.Owner, bloodstream.BloodSolutionName, ref bloodstream.BloodSolution, out var bloodSolution)
                 && bloodSolution.Volume < bloodSolution.MaxVolume)
@@ -147,7 +170,6 @@ public sealed class HealingSystem : EntitySystem
                 return true;
             }
 
-            // Is ent bleeding and can we stop it?
             if (healing.Comp.BloodlossModifier < 0 && bloodstream.BleedAmount > 0)
             {
                 return true;
@@ -161,23 +183,19 @@ public sealed class HealingSystem : EntitySystem
     {
         if (args.Handled)
             return;
-
-        // Отключаем "быстрое" самолечение по клику на иконку в руке:
-        // лечение должно идти через специализированные интерфейсы (например, панель здоровья).
+        
+        // Отключаем самолечение по клику в руке
         return;
     }
 
     private void OnHealingAfterInteract(Entity<HealingComponent> healing, ref AfterInteractEvent args)
     {
-        if (args.Handled || !args.CanReach || args.Target == null)
+        if (args.Handled)
             return;
 
-        // Abyss-14: disable "world click" healing. Healing should only be performed through the health panel.
-        if (!AbyssHealingContext.FromHealthPanel)
-            return;
-
-        if (TryHeal(healing, args.Target.Value, args.User))
-            args.Handled = true;
+        // Abyss-14: Блокируем ЛЮБОЙ хил через обычный клик мышкой в мире.
+        // Хил работает ТОЛЬКО через событие AbyssHealRequestEvent.
+        return;
     }
 
     private bool TryHeal(Entity<HealingComponent> healing, Entity<DamageableComponent?> target, EntityUid user)
@@ -192,8 +210,8 @@ public sealed class HealingSystem : EntitySystem
             return false;
         }
 
-        if (user != target.Owner && !_interactionSystem.InRangeUnobstructed(user, target.Owner, popup: true))
-            return false;
+        // Тут убрана проверка дистанции, так как она уже сделана в обработчике события,
+        // но для безопасности DoAfter'а она все равно нужна (проверяется внутри DoAfterSystem)
 
         if (TryComp<StackComponent>(healing, out var stack) && stack.Count < 1)
             return false;
@@ -221,8 +239,6 @@ public sealed class HealingSystem : EntitySystem
         var doAfterEventArgs =
             new DoAfterArgs(EntityManager, user, delay, new HealingDoAfterEvent(), target, target: target, used: healing)
             {
-                // Didn't break on damage as they may be trying to prevent it and
-                // not being able to heal your own ticking damage would be frustrating.
                 NeedHand = true,
                 BreakOnMove = true,
                 BreakOnWeightlessMove = false,
@@ -232,12 +248,6 @@ public sealed class HealingSystem : EntitySystem
         return true;
     }
 
-    /// <summary>
-    /// Scales the self-heal penalty based on the amount of damage taken
-    /// </summary>
-    /// <param name="ent">Entity we're healing</param>
-    /// <param name="mod">Maximum modifier we can have.</param>
-    /// <returns>Modifier we multiply our healing time by</returns>
     public float GetScaledHealingPenalty(Entity<DamageableComponent?, MobThresholdsComponent?> ent, float mod)
     {
         if (!Resolve(ent, ref ent.Comp1, ref ent.Comp2, false))
@@ -247,8 +257,6 @@ public sealed class HealingSystem : EntitySystem
             return 1;
 
         var percentDamage = (float)(ent.Comp1.TotalDamage / amount);
-        //basically make it scale from 1 to the multiplier.
-
         var output = percentDamage * (mod - 1) + 1;
         return Math.Max(output, 1);
     }
