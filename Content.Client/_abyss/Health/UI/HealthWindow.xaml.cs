@@ -2,6 +2,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Client.Interaction;
 using Content.Client.Roles;
+using Robust.Client.Input;
 using Content.Shared._abyss.Health;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Prototypes;
@@ -27,12 +28,16 @@ using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
+using Robust.Shared.IoC; // Важно: добавлено для зависимостей
 
 namespace Content.Client._abyss.Health.UI;
 
 [GenerateTypedNameReferences]
 public sealed partial class HealthWindow : Content.Client.UserInterface.Controls.FancyWindow
 {
+    // ИСПРАВЛЕНИЕ: Используем Dependency для InputManager
+    [Dependency] private readonly IInputManager _inputManager = default!;
+    
     private readonly IEntityManager _entMan;
     private readonly SharedHandsSystem _hands;
     private readonly InventorySystem _inventory;
@@ -55,7 +60,6 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         public DraggedHealingItem(EntityUid uid) => Uid = uid;
     }
 
-
     private static readonly Dictionary<string, string> LimbSlotToLocKey = new()
     {
         { "Head", "abyss-health-part-head" },
@@ -73,7 +77,12 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     public HealthWindow()
     {
         RobustXamlLoader.Load(this);
+        
+        // ИСПРАВЛЕНИЕ: Безопасно внедряем InputManager
+        IoCManager.InjectDependencies(this);
+
         _entMan = IoCManager.Resolve<IEntityManager>();
+        // _inputManager больше не нужен здесь, он внедрен через Dependency
         _playerManager = IoCManager.Resolve<IPlayerManager>();
         _jobSystem = _entMan.System<JobSystem>();
         _hands = _entMan.System<SharedHandsSystem>();
@@ -89,9 +98,23 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             RefreshInjuries();
             RefreshLimbHealthBars();
             RefreshTreatmentItems();
+
+            // Позволяет лечить сразу по клику на часть тела,
+            // если в активной руке уже выбран предмет лечения.
+            TryUseHealingFromActiveHand();
         };
         
         _dragHelper = new DragDropHelper<DraggedHealingItem>(OnBeginDrag, OnContinueDrag, OnEndDrag);
+
+        // DragDropHelper does not handle mouse-up automatically; ensure we always end on release.
+        OnKeyBindUp += args =>
+        {
+            if (args.Function != EngineKeyFunctions.UIClick)
+                return;
+
+            if (_dragHelper.Dragged != null)
+                _dragHelper.EndDrag();
+        };
     }
 
     private bool OnBeginDrag()
@@ -101,6 +124,10 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             return false;
         var uid = dragged.Uid;
         _pendingDragItem = uid;
+
+        // На всякий случай убираем старый призрак, если он по какой-то причине остался.
+        _dragGhost?.Orphan();
+
         _dragGhost = new SpriteView { SetSize = new Vector2(32, 32), MouseFilter = MouseFilterMode.Ignore };
         _dragGhost.SetEntity(uid);
         AddChild(_dragGhost);
@@ -109,11 +136,18 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
 
     private bool OnContinueDrag(float _)
     {
-        if (_dragGhost == null) return false;
+        if (_dragGhost == null)
+            return false;
+
+        // Если предмет пропал (например, его выкинули из рук или он удалился), отменяем перетаскивание.
+        var dragged = _dragHelper.Dragged;
+        if (dragged is null || !_entMan.EntityExists(dragged.Uid))
+            return false;
+
         var screenPos = _dragHelper.MouseScreenPosition.Position;
         var localPos = screenPos - GlobalPosition - _dragGhost.Size / 2;
         LayoutContainer.SetPosition(_dragGhost, localPos);
-        _pendingDragItem = _dragHelper.Dragged?.Uid;
+        _pendingDragItem = dragged.Uid;
         var dollRect = new UIBox2(BodyDoll.GlobalPosition, BodyDoll.GlobalPosition + BodyDoll.Size);
         _pendingDropOnDoll = dollRect.Contains(screenPos);
         return true;
@@ -123,7 +157,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     {
         if (_dragGhost != null)
         {
-            RemoveChild(_dragGhost);
+            // Orphan безопасен даже если окно уже закрывается или дерево UI меняется.
+            _dragGhost.Orphan();
             _dragGhost = null;
         }
         var item = _pendingDragItem;
@@ -146,9 +181,12 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     {
         base.FrameUpdate(args);
         _dragHelper.Update(args.DeltaSeconds);
+        
+        // ИСПРАВЛЕНИЕ: Удалили проблемную проверку InputManager.
+        // Обработка отпускания кнопки уже есть в OnKeyBindUp в конструкторе.
     }
 
-        private bool IsViewerMedical()
+    private bool IsViewerMedical()
     {
         var viewer = _playerManager.LocalEntity;
         if (!viewer.HasValue || !_entMan.TryGetComponent(viewer.Value, out MindContainerComponent? mindContainer) || mindContainer.Mind == null)
@@ -227,7 +265,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
                 totalDamage += abyss.PartDamage.GetValueOrDefault(slot);
             }
             var current = totalMax - totalDamage;
-                        var ratio = totalMax > FixedPoint2.Zero ? (float)((totalMax - totalDamage).Double() / totalMax.Double()) : 1f;
+            var ratio = totalMax > FixedPoint2.Zero ? (float)((totalMax - totalDamage).Double() / totalMax.Double()) : 1f;
             TotalHPBar.MaxValue = 1;
             TotalHPBar.Value = Math.Clamp(ratio, 0, 1);
             if (IsViewerMedical())
@@ -279,7 +317,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     protected override void Opened()
     {
         base.Opened();
-                RefreshAll();
+        RefreshAll();
     }
 
     /// <summary>
@@ -424,7 +462,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private void RefreshTreatmentItems()
     {
         TreatmentItemsList.RemoveAllChildren();
-        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
+        // Показываем рекомендуемые предметы только когда выбрана конкретная часть тела.
+        if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value) || string.IsNullOrEmpty(_selectedLimbSlot))
             return;
 
         var uid = _entity.Value;
@@ -540,9 +579,46 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         panel.AddChild(inner);
         panel.OnKeyBindDown += args =>
         {
-            if (args.Function == EngineKeyFunctions.UIClick)
-                StartDrag(item);
+            if (args.Function != EngineKeyFunctions.UIClick)
+                return;
+
+            args.Handle();
+            // Клик по рекомендуемому предмету: если он в активной руке, начинаем лечение.
+            TryUseHealingFromActiveHand(item);
         };
         return panel;
+    }
+
+    /// <summary>
+    /// Пытается запустить лечение активным предметом в руке (если это предмет лечения),
+    /// по текущей выбранной конечности. При переданном item дополнительно проверяет,
+    /// что активный предмет совпадает с ним.
+    /// </summary>
+    private void TryUseHealingFromActiveHand(EntityUid? requiredItem = null)
+    {
+        if (_entity is not { } target || !_entMan.EntityExists(target))
+            return;
+        if (string.IsNullOrEmpty(_selectedLimbSlot))
+            return;
+
+        var viewer = _playerManager.LocalEntity;
+        if (viewer is not { } viewerUid || !_entMan.TryGetComponent<Content.Shared.Hands.Components.HandsComponent>(viewerUid, out var hands))
+            return;
+
+        var activeItem = _hands.GetActiveItem((viewerUid, hands));
+        if (activeItem is not { } held)
+            return;
+
+        // Если требуем, чтобы активный предмет был именно тем, по которому кликнули.
+        if (requiredItem.HasValue && requiredItem.Value != held)
+            return;
+
+        // Лечим только предметами, у которых есть HealingComponent.
+        if (!_entMan.HasComponent<HealingComponent>(held))
+            return;
+
+        _entMan.RaisePredictiveEvent(new RequestUseItemOnEntityEvent(
+            _entMan.GetNetEntity(held),
+            _entMan.GetNetEntity(target)));
     }
 }
