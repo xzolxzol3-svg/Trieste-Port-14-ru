@@ -1,3 +1,4 @@
+using Content.Shared._abyss.Health;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Damage.Prototypes
@@ -28,5 +29,12 @@ namespace Content.Shared.Damage.Prototypes
         /// </summary>
         [DataField("armorFlatPrice")]
         public double ArmorPriceFlat { get; set; }
+
+        /// <summary>
+        /// Abyss-14: how this damage type should be applied to limbs.
+        /// Defaults to AllLimb to preserve vanilla behavior.
+        /// </summary>
+        [DataField("abyssLimbMode")]
+        public AbyssLimbMode AbyssLimbMode { get; set; } = AbyssLimbMode.AllLimb;
     }
 }

@@ -13,17 +13,16 @@
         </BoxContainer>
         <PanelContainer StyleClasses="LowDivider" Margin="0 2 0 4"/>
         <BoxContainer Orientation="Horizontal" VerticalExpand="True" HorizontalExpand="True">
-            <!-- Left: interactive doll (larger, clickable zones) -->
-            <BoxContainer Orientation="Vertical" Margin="4 4 4 4" HorizontalExpand="False">
-                <abyss:BodyDollControl Name="BodyDoll" MinSize="96 96" SetSize="96 96"/>
-            </BoxContainer>
-            <!-- Right: limb health bars + injury list for selected part -->
+            <!-- Left: interactive doll -->
+            <CenterContainer VerticalExpand="True" Margin="4 4 8 4">
+                <abyss:BodyDollControl Name="BodyDoll" MinSize="180 260" SetSize="180 260"/>
+            </CenterContainer>
+            <!-- Right: injury list for selected part -->
             <BoxContainer Orientation="Vertical" VerticalExpand="True" HorizontalExpand="True" Margin="4 4 4 4">
                 <Label Name="InjuriesLabel" Text="{Loc 'abyss-health-injuries'}" StyleClasses="LabelSubText"/>
                 <ScrollContainer VerticalExpand="True" HorizontalExpand="True">
                     <BoxContainer Name="InjuriesList" Orientation="Vertical" SeparationOverride="2"/>
                 </ScrollContainer>
-                <BoxContainer Name="LimbHealthBars" Orientation="Vertical" SeparationOverride="2" Margin="0 4 0 0"/>
             </BoxContainer>
         </BoxContainer>
         <PanelContainer StyleClasses="LowDivider" Margin="0 4 0 0"/>

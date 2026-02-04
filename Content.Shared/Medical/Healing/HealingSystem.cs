@@ -10,6 +10,7 @@ using Content.Shared.FixedPoint;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
+using Content.Shared._abyss.Health;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
@@ -161,13 +162,18 @@ public sealed class HealingSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (TryHeal(healing, args.User, args.User))
-            args.Handled = true;
+        // Отключаем "быстрое" самолечение по клику на иконку в руке:
+        // лечение должно идти через специализированные интерфейсы (например, панель здоровья).
+        return;
     }
 
     private void OnHealingAfterInteract(Entity<HealingComponent> healing, ref AfterInteractEvent args)
     {
         if (args.Handled || !args.CanReach || args.Target == null)
+            return;
+
+        // Abyss-14: disable "world click" healing. Healing should only be performed through the health panel.
+        if (!AbyssHealingContext.FromHealthPanel)
             return;
 
         if (TryHeal(healing, args.Target.Value, args.User))

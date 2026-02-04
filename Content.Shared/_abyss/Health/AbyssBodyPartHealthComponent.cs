@@ -14,7 +14,8 @@ public sealed partial class AbyssBodyPartHealthComponent : Component
     /// <summary> Limb slot IDs for UI and distribution. </summary>
     public static readonly string[] LimbSlots =
     {
-        "Head", "Torso", "LArm", "RArm", "LHand", "RHand", "LLeg", "RLeg", "LFoot", "RFoot"
+        // Keep the system simple: no hands/feet, only major limbs.
+        "Head", "Torso", "LArm", "RArm", "LLeg", "RLeg"
     };
 
     /// <summary> Max health per limb (same order as LimbSlots). Total ~100. </summary>
@@ -23,9 +24,7 @@ public sealed partial class AbyssBodyPartHealthComponent : Component
         (FixedPoint2) 15,  // Head
         (FixedPoint2) 50, // Torso
         (FixedPoint2) 12, (FixedPoint2) 12, // Arms
-        (FixedPoint2) 5, (FixedPoint2) 5,   // Hands
-        (FixedPoint2) 15, (FixedPoint2) 15, // Legs
-        (FixedPoint2) 5, (FixedPoint2) 5    // Feet
+        (FixedPoint2) 15, (FixedPoint2) 15 // Legs
     };
 
     /// <summary> Current damage per limb slot. Key = slot id (LimbSlots). </summary>

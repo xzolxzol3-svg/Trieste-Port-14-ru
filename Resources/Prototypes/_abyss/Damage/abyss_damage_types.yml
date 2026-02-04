@@ -1,0 +1,48 @@
+- type: damageType
+  id: HighPressure
+  name: damage-type-high-pressure
+  armorCoefficientPrice: 2.5
+  armorFlatPrice: 25
+
+- type: damageType
+  id: Bleeding
+  name: damage-type-bleeding
+  armorCoefficientPrice: 5
+  armorFlatPrice: 50
+
+- type: damageType
+  id: OrganDamage
+  name: damage-type-organ-damage
+  armorCoefficientPrice: 6
+  armorFlatPrice: 40
+
+- type: damageType
+  id: InternalDamage
+  name: damage-type-internal-damage
+  armorCoefficientPrice: 4
+  armorFlatPrice: 30
+
+- type: damageType
+  id: Bullet
+  name: damage-type-bullet
+  armorCoefficientPrice: 3
+  armorFlatPrice: 15
+
+- type: damageType
+  id: DeepTissueDamage
+  name: damage-type-deep-tissue-damage
+  armorCoefficientPrice: 5
+  armorFlatPrice: 30
+
+- type: damageType
+  id: Concussion
+  name: damage-type-concussion
+  armorCoefficientPrice: 4
+  armorFlatPrice: 20
+
+- type: damageType
+  id: Bite
+  name: damage-type-bite
+  armorCoefficientPrice: 2.5
+  armorFlatPrice: 12
+

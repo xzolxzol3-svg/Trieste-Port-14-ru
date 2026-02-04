@@ -13,7 +13,7 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
 {
     [Dependency] private readonly MovementSpeedModifierSystem _movementSpeed = default!;
 
-    private static readonly string[] LegSlots = { "LLeg", "RLeg", "LFoot", "RFoot" };
+    private static readonly string[] LegSlots = { "LLeg", "RLeg" };
 
     public override void Initialize()
     {
@@ -46,7 +46,7 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
                 damagedCount++;
         }
 
-        if (brokenCount >= 2 || brokenCount + damagedCount >= 3)
+        if (brokenCount >= 2)
         {
             args.ModifySpeed(0.2f, 0.2f);
             return;

@@ -66,12 +66,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         { "Torso", "abyss-health-part-torso" },
         { "LArm", "abyss-health-part-arm" },
         { "RArm", "abyss-health-part-arm" },
-        { "LHand", "abyss-health-part-hand" },
-        { "RHand", "abyss-health-part-hand" },
         { "LLeg", "abyss-health-part-leg" },
         { "RLeg", "abyss-health-part-leg" },
-        { "LFoot", "abyss-health-part-foot" },
-        { "RFoot", "abyss-health-part-foot" }
     };
 
     public HealthWindow()
@@ -96,7 +92,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             _selectedLimbSlot = slot;
             BodyDoll.SetSelectedSlot(slot);
             RefreshInjuries();
-            RefreshLimbHealthBars();
+            RefreshBodyDoll();
             RefreshTreatmentItems();
 
             // Позволяет лечить сразу по клику на часть тела,
@@ -219,17 +215,17 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         {
             BodyDoll.SetEntity(uid);
             BodyDoll.Visible = true;
-            UpdateDamagedSlots(uid);
+            RefreshBodyDoll();
         }
         else
         {
             BodyDoll.Visible = false;
-            BodyDoll.SetDamagedSlots(null);
+            BodyDoll.SetLimbHealthFractions(null);
         }
 
         RefreshTotalHP();
         RefreshInjuries();
-        RefreshLimbHealthBars();
+        RefreshBodyDoll();
         RefreshTreatmentItems();
     }
     /// <summary>
@@ -301,19 +297,6 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         }
     }
 
-    private void UpdateDamagedSlots(EntityUid uid)
-    {
-        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) || abyss.PartDamage == null)
-        {
-            BodyDoll.SetDamagedSlots(null);
-            return;
-        }
-        var damaged = AbyssBodyPartHealthComponent.LimbSlots
-            .Where(s => abyss.PartDamage.GetValueOrDefault(s) > FixedPoint2.Zero)
-            .ToList();
-        BodyDoll.SetDamagedSlots(damaged);
-    }
-
     protected override void Opened()
     {
         base.Opened();
@@ -331,17 +314,16 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             TotalHPBar.Value = 1;
             TotalHPBar.MaxValue = 1;
             BodyDoll.Visible = false;
-            BodyDoll.SetDamagedSlots(null);
+            BodyDoll.SetLimbHealthFractions(null);
             InjuriesList.RemoveAllChildren();
-            LimbHealthBars.RemoveAllChildren();
             TreatmentItemsList.RemoveAllChildren();
             return;
         }
         var uid = _entity.Value;
-        UpdateDamagedSlots(uid);
+        RefreshBodyDoll();
         RefreshTotalHP();
         RefreshInjuries();
-        RefreshLimbHealthBars();
+        RefreshBodyDoll();
         RefreshTreatmentItems();
     }
 
@@ -361,7 +343,9 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             return;
         }
 
-        if (!string.IsNullOrEmpty(_selectedLimbSlot) && _entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) && abyss.PartDamage != null && abyss.PartMaxHealth != null)
+        if (!string.IsNullOrEmpty(_selectedLimbSlot) &&
+            _entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) &&
+            abyss.PartDamage != null && abyss.PartMaxHealth != null)
         {
             var dmg = abyss.PartDamage.GetValueOrDefault(_selectedLimbSlot);
             var max = abyss.PartMaxHealth.GetValueOrDefault(_selectedLimbSlot);
@@ -373,15 +357,19 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
                 ? $"{limbName}: {dmg} / {max}" + (broken ? " (" + Loc.GetString("abyss-health-limb-broken") + ")" : "")
                 : limbName + ": " + Loc.GetString(GetDamageLevelKey(dmg, max)) + (broken ? " (" + Loc.GetString("abyss-health-limb-broken") + ")" : "");
             InjuriesList.AddChild(new Label { Text = limbText });
+
+            // Если на выбранной конечности нет урона, не показываем список эффектов вообще.
+            if (dmg <= FixedPoint2.Zero)
+                return;
         }
 
-        var damageDict = damageable.Damage?.DamageDict;
-        if (damageDict == null || (damageDict.Count == 0 && string.IsNullOrEmpty(_selectedLimbSlot)))
-        {
-            if (string.IsNullOrEmpty(_selectedLimbSlot))
-                InjuriesList.AddChild(new Label { Text = Loc.GetString("abyss-health-no-injuries") });
+        // Если конечность не выбрана - не показываем подробный список эффектов урона.
+        if (string.IsNullOrEmpty(_selectedLimbSlot))
             return;
-        }
+
+        var damageDict = damageable.Damage?.DamageDict;
+        if (damageDict == null || damageDict.Count == 0)
+            return;
 
         var totalDmg = damageDict.Values.Aggregate(FixedPoint2.Zero, (a, b) => a + b);
         foreach (var (damageTypeId, amount) in damageDict.OrderByDescending(x => x.Value))
@@ -397,7 +385,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             };
             var icon = new TextureRect
             {
-                SetSize = new Vector2(20, 20),
+                SetSize = new Vector2(24, 24),
                 Stretch = TextureRect.StretchMode.KeepAspectCentered,
                 Texture = GetDamageIcon(damageTypeId)
             };
@@ -425,29 +413,37 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         }
     }
 
-    private void RefreshLimbHealthBars()
+    private void RefreshBodyDoll()
     {
-        LimbHealthBars.RemoveAllChildren();
         if (!_entity.HasValue || !_entity.Value.IsValid() || !_entMan.EntityExists(_entity.Value))
+        {
+            BodyDoll.SetLimbHealthFractions(null);
             return;
-        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(_entity.Value, out var abyss) || abyss.PartMaxHealth == null || abyss.PartDamage == null)
-            return;
+        }
 
+        var uid = _entity.Value;
+        if (!_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(uid, out var abyss) || abyss.PartMaxHealth == null || abyss.PartDamage == null)
+        {
+            BodyDoll.SetLimbHealthFractions(null);
+            return;
+        }
+
+        var frac = new Dictionary<string, float>(AbyssBodyPartHealthComponent.LimbSlots.Length);
         foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
         {
             var max = abyss.PartMaxHealth.GetValueOrDefault(slot);
             var dmg = abyss.PartDamage.GetValueOrDefault(slot);
             if (max <= FixedPoint2.Zero)
+            {
+                frac[slot] = 1f;
                 continue;
-            var name = LimbSlotToLocKey.TryGetValue(slot, out var key) ? Loc.GetString(key) : slot;
-            var frac = (float)(1.0 - (dmg / max).Double());
-            var bar = new ProgressBar { MinValue = 0, MaxValue = 1, Value = Math.Clamp(frac, 0, 1), HorizontalExpand = true };
-            var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
-            var labelText = IsViewerMedical() ? name : $"{name}: {Loc.GetString(GetDamageLevelKey(dmg, max))}";
-            row.AddChild(new Label { Text = labelText, MinSize = new Vector2(50, 0) });
-            row.AddChild(bar);
-            LimbHealthBars.AddChild(row);
+            }
+
+            var f = (float)(1.0 - (dmg / max).Double());
+            frac[slot] = Math.Clamp(f, 0f, 1f);
         }
+
+        BodyDoll.SetLimbHealthFractions(frac);
     }
 
     private Texture? GetDamageIcon(string damageTypeId)
@@ -616,6 +612,14 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         // Лечим только предметами, у которых есть HealingComponent.
         if (!_entMan.HasComponent<HealingComponent>(held))
             return;
+
+        // Не лечим здоровую конечность: проверяем, что на выбранном слоте есть урон.
+        if (_entMan.TryGetComponent<AbyssBodyPartHealthComponent>(target, out var abyss)
+            && abyss.PartDamage != null
+            && abyss.PartDamage.GetValueOrDefault(_selectedLimbSlot) <= FixedPoint2.Zero)
+        {
+            return;
+        }
 
         _entMan.RaisePredictiveEvent(new RequestUseItemOnEntityEvent(
             _entMan.GetNetEntity(held),

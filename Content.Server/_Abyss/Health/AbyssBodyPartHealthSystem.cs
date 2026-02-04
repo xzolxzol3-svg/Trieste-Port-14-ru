@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Content.Shared._abyss.Health;
+using Content.Shared.Damage.Components;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.Body.Components;
 using Content.Shared.Damage.Components;
 using Content.Shared.FixedPoint;
@@ -48,17 +50,72 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
         if (inner.DamageDelta == null || inner.DamageDelta.Empty)
             return;
 
-        var delta = inner.DamageDelta.GetTotal();
-        if (delta == FixedPoint2.Zero)
+        if (!TryComp<DamageableComponent>(uid, out var damageable))
             return;
 
-        if (delta > FixedPoint2.Zero)
-            AddDamageToRandomLimb(component, delta);
-        else
-            SubtractHealingFromRandomDamagedLimb(component, -delta);
+        // Модульное распределение по типам урона: для каждого DamageType смотрим его AbyssLimbMode.
+        foreach (var (typeId, delta) in inner.DamageDelta.DamageDict)
+        {
+            if (delta == FixedPoint2.Zero)
+                continue;
+
+            if (!damageable.Damage.DamageDict.TryGetValue(typeId, out _))
+                continue;
+
+            if (!IoCManager.Resolve<Robust.Shared.Prototypes.IPrototypeManager>()
+                    .TryIndex<DamageTypePrototype>(typeId, out var damageType))
+            {
+                // Неизвестный тип урона - по умолчанию как AllLimb.
+                ApplyAllLimb(component, delta);
+                continue;
+            }
+
+            switch (damageType.AbyssLimbMode)
+            {
+                case AbyssLimbMode.AllLimb:
+                    if (delta > FixedPoint2.Zero)
+                        AddDamageToRandomLimb(component, delta);
+                    else
+                        SubtractHealingFromRandomDamagedLimb(component, -delta);
+                    break;
+
+                case AbyssLimbMode.TorsoOnly:
+                    ApplyToSingleLimb(component, "Torso", delta);
+                    break;
+
+                case AbyssLimbMode.TotalOnly:
+                    // Только total HP, не трогаем конечности.
+                    break;
+            }
+        }
 
         Dirty(uid, component);
         _movementSpeed.RefreshMovementSpeedModifiers(uid);
+    }
+
+    private void ApplyAllLimb(AbyssBodyPartHealthComponent comp, FixedPoint2 delta)
+    {
+        if (delta > FixedPoint2.Zero)
+            AddDamageToRandomLimb(comp, delta);
+        else if (delta < FixedPoint2.Zero)
+            SubtractHealingFromRandomDamagedLimb(comp, -delta);
+    }
+
+    private void ApplyToSingleLimb(AbyssBodyPartHealthComponent comp, string slot, FixedPoint2 delta)
+    {
+        if (comp.PartMaxHealth == null || comp.PartDamage == null)
+            return;
+
+        var max = comp.PartMaxHealth.GetValueOrDefault(slot);
+        var cur = comp.PartDamage.GetValueOrDefault(slot);
+        var newVal = cur + delta;
+
+        if (delta > FixedPoint2.Zero && max > FixedPoint2.Zero)
+            newVal = FixedPoint2.Min(newVal, max);
+        if (delta < FixedPoint2.Zero)
+            newVal = FixedPoint2.Max(FixedPoint2.Zero, newVal);
+
+        comp.PartDamage[slot] = newVal;
     }
 
     private void OnAbyssHealthInit(Entity<AbyssBodyPartHealthComponent> ent, ref ComponentInit args)
@@ -108,18 +165,36 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
     {
         if (comp.PartDamage == null)
             return;
-        var damaged = new List<string>();
-        foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
+        // Previously healing was applied to a random damaged limb which often felt like a "desync"
+        // (total HP looks fully healed while a specific limb stays damaged).
+        // Heal the most damaged limb(s) first for more intuitive behavior.
+        var remaining = amount;
+        while (remaining > FixedPoint2.Zero)
         {
-            if ((comp.PartDamage.GetValueOrDefault(slot)) > FixedPoint2.Zero)
-                damaged.Add(slot);
-        }
-        if (damaged.Count == 0)
-            return;
+            string? chosen = null;
+            var chosenDamage = FixedPoint2.Zero;
 
-        var chosen = _random.Pick(damaged);
-        var cur = comp.PartDamage[chosen];
-        comp.PartDamage[chosen] = FixedPoint2.Max(FixedPoint2.Zero, cur - amount);
+            foreach (var slot in AbyssBodyPartHealthComponent.LimbSlots)
+            {
+                var dmg = comp.PartDamage.GetValueOrDefault(slot);
+                if (dmg <= FixedPoint2.Zero)
+                    continue;
+
+                if (chosen == null || dmg > chosenDamage)
+                {
+                    chosen = slot;
+                    chosenDamage = dmg;
+                }
+            }
+
+            if (chosen == null)
+                return;
+
+            var cur = comp.PartDamage.GetValueOrDefault(chosen);
+            var sub = FixedPoint2.Min(cur, remaining);
+            comp.PartDamage[chosen] = FixedPoint2.Max(FixedPoint2.Zero, cur - sub);
+            remaining -= sub;
+        }
     }
 
     private void DistributeDamageToRandomLimbs(AbyssBodyPartHealthComponent comp, FixedPoint2 total)

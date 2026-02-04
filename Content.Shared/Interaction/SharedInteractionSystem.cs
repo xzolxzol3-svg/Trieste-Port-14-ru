@@ -13,6 +13,7 @@ using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Input;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Interaction.Events;
+using Content.Shared._abyss.Health;
 using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Item;
@@ -330,7 +331,17 @@ namespace Content.Shared.Interaction
             if (!InRangeUnobstructed(user, target, popup: true))
                 return;
 
-            InteractUsing(user, item, target, Transform(target).Coordinates, checkCanInteract: false, checkCanUse: false);
+            // Mark this interaction as coming from the Abyss health panel.
+            var prev = AbyssHealingContext.FromHealthPanel;
+            AbyssHealingContext.FromHealthPanel = true;
+            try
+            {
+                InteractUsing(user, item, target, Transform(target).Coordinates, checkCanInteract: false, checkCanUse: false);
+            }
+            finally
+            {
+                AbyssHealingContext.FromHealthPanel = prev;
+            }
         }
 
 
