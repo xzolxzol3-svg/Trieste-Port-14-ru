@@ -11,9 +11,11 @@ namespace Content.Shared._abyss.Health;
 public sealed class AbyssDamageChangedEvent : EntityEventArgs
 {
     public readonly DamageChangedEvent Inner;
+    public readonly string? TargetLimb;
 
-    public AbyssDamageChangedEvent(DamageChangedEvent inner)
+    public AbyssDamageChangedEvent(DamageChangedEvent inner, string? targetLimb = null)
     {
         Inner = inner;
+        TargetLimb = targetLimb;
     }
 }

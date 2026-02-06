@@ -10,10 +10,12 @@ public sealed class AbyssHealRequestEvent : EntityEventArgs
 {
     public NetEntity Item;
     public NetEntity Target;
+    public string? TargetLimb;
 
-    public AbyssHealRequestEvent(NetEntity item, NetEntity target)
+    public AbyssHealRequestEvent(NetEntity item, NetEntity target, string? targetLimb = null)
     {
         Item = item;
         Target = target;
+        TargetLimb = targetLimb;
     }
 }

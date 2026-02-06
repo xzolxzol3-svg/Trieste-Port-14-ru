@@ -158,7 +158,8 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         // !!! ИСПРАВЛЕНИЕ: Отправляем наш кастомный ивент !!!
         _entMan.RaisePredictiveEvent(new AbyssHealRequestEvent(
             _entMan.GetNetEntity(validItem),
-            _entMan.GetNetEntity(targetEntity)));
+            _entMan.GetNetEntity(targetEntity),
+            _selectedLimbSlot));
     }
 
     private void StartDrag(EntityUid item)
@@ -594,6 +595,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         // !!! ИСПРАВЛЕНИЕ: Отправляем наш кастомный ивент !!!
         _entMan.RaisePredictiveEvent(new AbyssHealRequestEvent(
             _entMan.GetNetEntity(held),
-            _entMan.GetNetEntity(target)));
+            _entMan.GetNetEntity(target),
+            _selectedLimbSlot));
     }
 }

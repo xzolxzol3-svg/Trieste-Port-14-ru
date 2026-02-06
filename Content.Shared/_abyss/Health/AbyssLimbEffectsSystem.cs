@@ -20,6 +20,15 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
 
     private static readonly string[] LegSlots = { "LLeg", "RLeg" };
 
+    /// <summary>
+    /// Контекст для целевого лечения/урона. Устанавливается перед вызовом TryChangeDamage.
+    /// Используется только в однопоточном синхронном коде!
+    /// </summary>
+    private string? _tempTargetLimb;
+
+    public void SetTargetLimb(string limb) => _tempTargetLimb = limb;
+    public void ClearTargetLimb() => _tempTargetLimb = null;
+
     public override void Initialize()
     {
         base.Initialize();
@@ -41,7 +50,7 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
                 // Мы вычисляем разницу между тем, что в панели, и тем, что сейчас в системе Bloodstream
                 var targetBleed = bleedDamage.Float();
                 var delta = targetBleed - bloodstream.BleedAmount;
-                
+
                 if (Math.Abs(delta) > 0.1f)
                 {
                     // ИСПРАВЛЕНО: Убран 3-й аргумент. Метод принимает (uid, amount).
@@ -90,7 +99,17 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
             }
         }
 
-        RaiseLocalEvent(uid, new AbyssDamageChangedEvent(args));
+        // Передаем контекст (_tempTargetLimb), если он был установлен
+        RaiseLocalEvent(uid, new AbyssDamageChangedEvent(args, _tempTargetLimb));
+    }
+
+    /// <summary>
+    /// Специальный метод для вызова события с указанием конкретной конечности.
+    /// Вызывается из HealingSystem при целевом лечении.
+    /// </summary>
+    public void RaiseAbyssDamageChanged(EntityUid uid, DamageChangedEvent args, string? targetLimb)
+    {
+        RaiseLocalEvent(uid, new AbyssDamageChangedEvent(args, targetLimb));
     }
 
     private void OnRefreshSpeed(EntityUid uid, AbyssBodyPartHealthComponent component, RefreshMovementSpeedModifiersEvent args)
@@ -105,7 +124,7 @@ public sealed class AbyssLimbEffectsSystem : EntitySystem
             var max = component.PartMaxHealth.GetValueOrDefault(slot);
             var dmg = component.PartDamage.GetValueOrDefault(slot);
             if (max <= FixedPoint2.Zero) continue;
-            
+
             if (component.IsLimbBroken(slot))
                 brokenCount++;
             else if (dmg > FixedPoint2.Zero)

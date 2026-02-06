@@ -32,6 +32,7 @@ public sealed class HealingSystem : EntitySystem
     [Dependency] private readonly MobThresholdSystem _mobThresholdSystem = default!;
     [Dependency] private readonly SharedPopupSystem _popupSystem = default!;
     [Dependency] private readonly SharedSolutionContainerSystem _solutionContainerSystem = default!;
+    [Dependency] private readonly AbyssLimbEffectsSystem _abyssLimbEffects = default!; // Добавлено
 
     public override void Initialize()
     {
@@ -40,7 +41,7 @@ public sealed class HealingSystem : EntitySystem
         SubscribeLocalEvent<HealingComponent, UseInHandEvent>(OnHealingUse);
         SubscribeLocalEvent<HealingComponent, AfterInteractEvent>(OnHealingAfterInteract);
         SubscribeLocalEvent<DamageableComponent, HealingDoAfterEvent>(OnDoAfter);
-        
+
         // !!! НОВОЕ: Слушаем команду от UI панели !!!
         SubscribeAllEvent<AbyssHealRequestEvent>(OnAbyssHealRequest);
     }
@@ -102,7 +103,29 @@ public sealed class HealingSystem : EntitySystem
         if (healing.ModifyBloodLevel != 0 && bloodstream != null)
             _bloodstreamSystem.TryModifyBloodLevel((target.Owner, bloodstream), healing.ModifyBloodLevel);
 
-        if (!_damageable.TryChangeDamage(target.Owner, healing.Damage * _damageable.UniversalTopicalsHealModifier, out var healed, true, origin: args.Args.User) && healing.BloodlossModifier != 0)
+        // Получаем целевую конечность из события DoAfter
+        string? targetLimb = null;
+        if (args.Args.Event is HealingDoAfterEvent healEv)
+        {
+            targetLimb = healEv.TargetLimb;
+        }
+
+        // Устанавливаем контекст в AbyssLimbEffectsSystem перед вызовом TryChangeDamage
+        // Это безопасно в однопоточной среде (Game Thread), так как TryChangeDamage синхронный.
+        if (targetLimb != null)
+        {
+            _abyssLimbEffects.SetTargetLimb(targetLimb);
+        }
+
+        var result = _damageable.TryChangeDamage(target.Owner, healing.Damage * _damageable.UniversalTopicalsHealModifier, out var healed, true, origin: args.Args.User);
+
+        // Очищаем контекст сразу после выполнения
+        if (targetLimb != null)
+        {
+            _abyssLimbEffects.ClearTargetLimb();
+        }
+
+        if (!result && healing.BloodlossModifier != 0)
             return;
 
         var total = healed.GetTotal();
@@ -183,7 +206,7 @@ public sealed class HealingSystem : EntitySystem
     {
         if (args.Handled)
             return;
-        
+
         // Отключаем самолечение по клику в руке
         return;
     }
@@ -198,7 +221,7 @@ public sealed class HealingSystem : EntitySystem
         return;
     }
 
-    private bool TryHeal(Entity<HealingComponent> healing, Entity<DamageableComponent?> target, EntityUid user)
+    private bool TryHeal(Entity<HealingComponent> healing, Entity<DamageableComponent?> target, EntityUid user, string? targetLimb = null)
     {
         if (!Resolve(target, ref target.Comp, false))
             return false;
@@ -237,7 +260,7 @@ public sealed class HealingSystem : EntitySystem
             : healing.Comp.Delay * GetScaledHealingPenalty(target, healing.Comp.SelfHealPenaltyMultiplier);
 
         var doAfterEventArgs =
-            new DoAfterArgs(EntityManager, user, delay, new HealingDoAfterEvent(), target, target: target, used: healing)
+            new DoAfterArgs(EntityManager, user, delay, new HealingDoAfterEvent(targetLimb), target, target: target, used: healing)
             {
                 NeedHand = true,
                 BreakOnMove = true,

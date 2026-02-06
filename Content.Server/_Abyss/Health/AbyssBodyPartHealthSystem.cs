@@ -53,6 +53,9 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
         if (!TryComp<DamageableComponent>(uid, out var damageable))
             return;
 
+        // Получаем целевую конечность из аргументов события (если есть)
+        string? targetedLimb = args.TargetLimb;
+
         // Модульное распределение по типам урона: для каждого DamageType смотрим его AbyssLimbMode.
         foreach (var (typeId, delta) in inner.DamageDelta.DamageDict)
         {
@@ -65,8 +68,23 @@ public sealed class AbyssBodyPartHealthSystem : EntitySystem
             if (!IoCManager.Resolve<Robust.Shared.Prototypes.IPrototypeManager>()
                     .TryIndex<DamageTypePrototype>(typeId, out var damageType))
             {
-                // Неизвестный тип урона - по умолчанию как AllLimb.
-                ApplyAllLimb(component, delta);
+                // Если задана конкретная конечность для лечения/урона - используем её
+                if (targetedLimb != null)
+                {
+                    ApplyToSingleLimb(component, targetedLimb, delta);
+                }
+                else
+                {
+                    // Неизвестный тип урона - по умолчанию как AllLimb.
+                    ApplyAllLimb(component, delta);
+                }
+                continue;
+            }
+
+            // Если задана конкретная конечность для лечения/урона - используем её, ИГНОРИРУЯ AbyssLimbMode
+            if (targetedLimb != null)
+            {
+                ApplyToSingleLimb(component, targetedLimb, delta);
                 continue;
             }
 
