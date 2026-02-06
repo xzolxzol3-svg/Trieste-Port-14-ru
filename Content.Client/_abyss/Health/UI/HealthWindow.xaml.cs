@@ -36,7 +36,7 @@ namespace Content.Client._abyss.Health.UI;
 public sealed partial class HealthWindow : Content.Client.UserInterface.Controls.FancyWindow
 {
     [Dependency] private readonly IInputManager _inputManager = default!;
-    
+
     private readonly IEntityManager _entMan;
     private readonly SharedHandsSystem _hands;
     private readonly InventorySystem _inventory;
@@ -47,6 +47,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
     private readonly IResourceCache _cache;
 
     private EntityUid? _entity;
+    public EntityUid? CurrentEntity => _entity;
     private string? _selectedLimbSlot;
     private readonly DragDropHelper<DraggedHealingItem> _dragHelper;
     private SpriteView? _dragGhost;
@@ -92,7 +93,7 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
             RefreshTreatmentItems();
             TryUseHealingFromActiveHand();
         };
-        
+
         _dragHelper = new DragDropHelper<DraggedHealingItem>(OnBeginDrag, OnContinueDrag, OnEndDrag);
 
         OnKeyBindUp += args =>
@@ -150,10 +151,10 @@ public sealed partial class HealthWindow : Content.Client.UserInterface.Controls
         var dropOnDoll = _pendingDropOnDoll;
         _pendingDragItem = null;
         _pendingDropOnDoll = false;
-        
+
         if (!dropOnDoll || item is not { } validItem || _entity is not { } targetEntity || !_entMan.EntityExists(targetEntity) || !_entMan.EntityExists(validItem))
             return;
-        
+
         // !!! ИСПРАВЛЕНИЕ: Отправляем наш кастомный ивент !!!
         _entMan.RaisePredictiveEvent(new AbyssHealRequestEvent(
             _entMan.GetNetEntity(validItem),

@@ -16,6 +16,7 @@ public sealed class AbyssExamineHealthVerbSystem : EntitySystem
     [Dependency] private readonly IUserInterfaceManager _ui = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private readonly SharedTransformSystem _transform = default!;
 
     private (EntityUid Target, double OpenAtTime)? _pendingExamine;
     private const double ExamineDelaySec = 1.5;
@@ -44,6 +45,15 @@ public sealed class AbyssExamineHealthVerbSystem : EntitySystem
                 _pendingExamine = (target, _timing.RealTime.TotalSeconds + ExamineDelaySec);
             }
         };
+
+        var userPos = _transform.GetMapCoordinates(args.User);
+        var targetPos = _transform.GetMapCoordinates(args.Target);
+        if (!userPos.InRange(targetPos, 1.5f))
+        {
+            verb.Disabled = true;
+            verb.Message = Loc.GetString("abyss-health-verb-disabled-range");
+        }
+
         args.Verbs.Add(verb);
     }
 

@@ -13,6 +13,7 @@ public sealed class AbyssHealthUIController : UIController, IOnStateEntered<Game
 {
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly IPlayerManager _player = default!;
+    [Dependency] private readonly IEntityManager _entityManager = default!;
 
     private HealthWindow? _window;
     private double _lastRefreshTime;
@@ -60,6 +61,20 @@ public sealed class AbyssHealthUIController : UIController, IOnStateEntered<Game
     {
         if (_window == null || !_window.IsOpen)
             return;
+
+        var local = _player.LocalEntity;
+        if (local != null && _window.CurrentEntity is { } target && target != local)
+        {
+            var transformSystem = _entityManager.System<SharedTransformSystem>();
+            var localPos = transformSystem.GetMapCoordinates(local.Value);
+            var targetPos = transformSystem.GetMapCoordinates(target);
+            if (!localPos.InRange(targetPos, 1.5f))
+            {
+                _window.Close();
+                return;
+            }
+        }
+
         var now = _timing.RealTime.TotalSeconds;
         if (now - _lastRefreshTime < RefreshIntervalSec)
             return;
